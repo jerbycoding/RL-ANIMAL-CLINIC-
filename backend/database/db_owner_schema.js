@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-
+//Owner
 const {Schema,model} = mongoose;
 
 const ownerInformationSchema =  new Schema({
