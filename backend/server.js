@@ -2,6 +2,7 @@ import express from 'express'
 import mongoose from 'mongoose'
 import ownerInformation from './database/db_owner_schema.js';
 import patientInformation from './database/db_patient_schema.js';
+import Employee from './database/db_employee_schema.js';
 import {body,validationResult} from 'express-validator';
 
 const app = express();
@@ -149,7 +150,7 @@ app.post('/patient',[
     
         }
         const patient = new patientInformation(patientProfile);
-        patient.save();
+        await patient.save();
         return res.status(201).send('success');
     }catch(err){
         res.status(400).send(err.message);
@@ -169,6 +170,15 @@ app.delete('/patient/:id',async(req,res)=>{
         res.status(200).send('Soft Delete Succesfully')
     }catch(err){
         res.staus(400).send('Delete Failed')
+    }
+})
+
+app.get('/employees', async(req,res)=>{
+    try{
+        const employees = await Employee.find({});
+        console.log(employees);
+    }catch(err){
+        console.log(err)
     }
 })
 mongoose.connect('mongodb+srv://jerbyyi:xdpp8irbU5OABbXV@cluster0.rk5vp.mongodb.net/RL?retryWrites=true&w=majority&appName=Cluster0').then(()=>{

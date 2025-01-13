@@ -4,7 +4,7 @@ const {Schema, model} = mongoose
 
 
 const patientInformationSchema = new Schema({
-    ownerID : {type: Schema.Types.ObjectId, ref : 'ownerInformation', required: true},
+    ownerID :{type:String, required: true},  /*type: Schema.Types.ObjectId, ref : 'ownerInformation', required: truea}*/
     name : {type: String, required : true},
     species : {type:String, required: true , enum : ['dog', 'cat']},
     breed : {type:String },
