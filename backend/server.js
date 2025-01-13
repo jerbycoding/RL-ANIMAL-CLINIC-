@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 import ownerInformation from './database/db_owner_schema.js';
 import patientInformation from './database/db_patient_schema.js';
 import {body,validationResult} from 'express-validator';
-import cors  from 'cors';
+
 const app = express();
 app.use(express.json());
 
