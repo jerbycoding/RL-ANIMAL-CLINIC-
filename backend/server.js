@@ -3,6 +3,7 @@ import mongoose from 'mongoose'
 import ownerInformation from './database/db_owner_schema.js';
 import patientInformation from './database/db_patient_schema.js';
 import Employee from './database/db_employee_schema.js';
+import Inventory from './database/db_inventory_schema.js';
 import {body,validationResult} from 'express-validator';
 
 const app = express();
@@ -38,13 +39,13 @@ app.post('/owner',
             return res.status(400).send(errors);
         }   
         try{
-            const owner = new ownerInformation(ownerProfile);
             const data = req.body;
             const ownerProfile = {
                 name:{ first: data.name.first, middle: data.name.middle, last: data.name.last},
                 contactInformation : { email : data.contactInformation.email, contactNumber : data.contactInformation.contactNumber},
                 patients :data.patients.map((value)=>{ return {_id : value}}),
                 notes: data.notes}
+            const owner = new ownerInformation(ownerProfile);
             await owner.save()
             return res.status(201).json({message: "Success"});
         }catch(err){
@@ -172,15 +173,59 @@ app.delete('/patient/:id',async(req,res)=>{
         res.staus(400).send('Delete Failed')
     }
 })
-
-app.get('/employees', async(req,res)=>{
+app.get('/inventories', async(req,res)=>{
     try{
-        const employees = await Employee.find({});
-        console.log(employees);
+        const items = await Inventory.find({});
+        res.status(200).json({items})
     }catch(err){
-        console.log(err)
+        res.send(err.message)
     }
 })
+app.get('/inventories/food', async(req,res)=>{
+    try{
+        const food = await Inventory.find({category : 'food'});
+        res.status(200).json({food});
+    }catch(err){
+        res.send(err.message);
+    }
+})
+app.get('/inventories/medication', async(req,res)=>{
+    try{
+        const medication = await Inventory.find({category : 'medication'});
+        res.status(200).json({medication})
+    }catch(err){
+        res.send(err.message);  
+    }
+})
+app.post('/inventories', async(req,res)=>{
+    try{
+        const data = req.body;
+        const item = {
+            itemName : data.itemName,
+            category : data.category,
+            quantity : data.quantity,
+            unit : data.unit,
+            pricePerUnit : data.pricePerUnit,
+            expirationDate : data.expirationDate,
+            supplier : {name : data.supplier.name, contactNumber : data.supplier.contactNumber},
+            notes : data.note
+        }
+        const inventory = new Inventory(item);
+        await inventory.save();
+        return res.status(201).json({message:"success"})
+    }catch(err){
+        res.send(err.message);
+    }
+})
+
+// app.get('/employees', async(req,res)=>{
+//     try{
+//         const employees = await Employee.find({});
+//         console.log(employees);
+//     }catch(err){
+//         console.log(err)
+//     }
+// })
 mongoose.connect('mongodb+srv://jerbyyi:xdpp8irbU5OABbXV@cluster0.rk5vp.mongodb.net/RL?retryWrites=true&w=majority&appName=Cluster0').then(()=>{
     app.listen(5000, ()=>{
         console.log('http://localhost:5000')

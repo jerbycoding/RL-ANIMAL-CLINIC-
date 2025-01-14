@@ -6,7 +6,7 @@ const inventorySchema = new Schema(
         itemName: { type: String, required: true, trim: true }, 
         category: {
             type: String,
-            enum: ['medication', 'equipment', 'supplies', 'food', 'other'], 
+            enum: ['medication', 'food'], 
             required: true,
         },
         quantity: { type: Number, required: true, min: 0 }, 
