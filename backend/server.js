@@ -18,22 +18,17 @@ app.get('/owners',async(req,res)=>{
         res.send(message.err);
     }
 })
-app.get('/owner/:id',async(req,res)=>{
-    const {id} = req.params;
-    const owner = await ownerInformation.findById(id);
-    res.status(200).json(owner)
-})
 app.post('/owner',
-        [
-            body('name.first').notEmpty().withMessage('FirstName is Required'),
-            body('name.last').notEmpty().withMessage('LastName is Required'),
-            body('email').isEmail().withMessage('email Required'),
-            body('contactNumber').isNumeric().withMessage('contact number must be numeric'),
-            body('patients').isArray().optional(),
-            body('notes').isString().optional().withMessage('Notes must be String')
-        ]
+    [
+        body('name.first').notEmpty().withMessage('FirstName is Required'),
+        body('name.last').notEmpty().withMessage('LastName is Required'),
+        body('email').isEmail().withMessage('email Required'),
+        body('contactNumber').isNumeric().withMessage('contact number must be numeric'),
+        body('patients').isArray().optional(),
+        body('notes').isString().optional().withMessage('Notes must be String')
+    ]
     ,async(req,res)=>{
-  
+
         const errors = validationResult(req);
         if(!errors.isEmpty()){
             return res.status(400).send(errors);
@@ -52,6 +47,12 @@ app.post('/owner',
             res.status(500).json({message:"server error"});
         }
 });
+app.get('/owner/:id',async(req,res)=>{
+    const {id} = req.params;
+    const owner = await ownerInformation.findById(id);
+    res.status(200).json(owner)
+})
+
 app.put('/owner/:id', async(req,res)=>{
     try{
         const {id} = req.params;
@@ -82,11 +83,6 @@ app.get('/patients',async(req,res)=>{
         res.status(500).json({})
     }
     
-})
-app.get('/patient/:id',async(req,res)=>{
-    const {id} =req.params;
-    const patients = await patientInformation.findById(id);
-    res.status(200).json(patients); 
 })
 app.post('/patient',[
     body('name').notEmpty().withMessage('required Name'),
@@ -158,6 +154,12 @@ app.post('/patient',[
     }
 
 })
+app.get('/patient/:id',async(req,res)=>{
+    const {id} =req.params;
+    const patients = await patientInformation.findById(id);
+    res.status(200).json(patients); 
+})
+
 app.put('/patient/:id',async(req,res)=>{
     const {id} = req.params;
     const update = req.body; 
@@ -181,22 +183,6 @@ app.get('/inventories', async(req,res)=>{
         res.send(err.message)
     }
 })
-app.get('/inventories/food', async(req,res)=>{
-    try{
-        const food = await Inventory.find({category : 'food'});
-        res.status(200).json({food});
-    }catch(err){
-        res.send(err.message);
-    }
-})
-app.get('/inventories/medication', async(req,res)=>{
-    try{
-        const medication = await Inventory.find({category : 'medication'});
-        res.status(200).json({medication})
-    }catch(err){
-        res.send(err.message);  
-    }
-})
 app.post('/inventories', async(req,res)=>{
     try{
         const data = req.body;
@@ -217,13 +203,97 @@ app.post('/inventories', async(req,res)=>{
         res.send(err.message);
     }
 })
+app.get('/inventories/food', async(req,res)=>{
+    try{
+       
+        const food = await Inventory.find({category : "food"});
+        res.status(200).json(food);
+    }catch(err){
+        
+        res.send(err.message);
+    }
+})
+app.get('/inventories/medication', async(req,res)=>{
+    try{
+      
+        const medication = await Inventory.find({category:"medication"})
+        res.status(200).json({medication});
+        
+    }catch(err){
+        res.send(err.message);  
+    }
+})
+app.get('/inventories/:id',async(req,res)=>{
+    try{
+        const {id} = req.params
+        const item = await Inventory.findById(id)
+        return res.status(200).json(item)
+    }catch(err){
+        return res.status(400).json({message:err.message})
+    }
+})
+
+
+
+app.put('/inventories/:id', async (req,res)=>{
+    try{
+        const {id} = req.params;
+        const update = req.body;
+        const item = await Inventory.findByIdAndUpdate(id,update);
+        return res.status(200).json({message:"success" , data: item});
+    }catch(err){
+        return res.status(400).json({message : err.message});
+    }
+})
+
+app.delete('/inventories/:id', async(req,res)=>{
+    try{
+        const {id} = req.params;
+        await Inventory.findByIdAndDelete(id);
+        return res.json({message:"success"})        
+    }catch(err){
+        return res.status(400).json({message: err.message})
+    }
+})
 
 // app.get('/employees', async(req,res)=>{
 //     try{
 //         const employees = await Employee.find({});
-//         console.log(employees);
+//         return res.status(200).json({employees});
 //     }catch(err){
-//         console.log(err)
+//         return res.status(400).json({message: err.message});
+//     }
+// })
+// // app.post('/employees',async(req,res)=>{
+// //     try{
+// //         const data = req.body;
+// //         const employee = {
+// //             {
+// //                 firstName: ,
+// //                 lastName: ,
+// //                 role: ,
+// //                 contactInformation: {
+// //                     email: , 
+// //                     phone: , 
+// //                 },
+        
+// //                 associatedPatients: [ ],
+// //                 dateHired: , 
+// //                 isActive: , 
+// //                 notes: , 
+// //             }
+// //         } 
+// //     }catch(err){
+// //         return res.status(400).json({message:err.message})
+// //     }
+// // })
+// app.get('employees/:id',async(req,res)=>{
+//     try{
+//         const {id} =req.params
+//         const employee = await employee.findById(id)
+//         return res.status(200).json(employee)
+//     }catch(err){
+//         return res.status(400).json({message:err.message});
 //     }
 // })
 mongoose.connect('mongodb+srv://jerbyyi:xdpp8irbU5OABbXV@cluster0.rk5vp.mongodb.net/RL?retryWrites=true&w=majority&appName=Cluster0').then(()=>{
