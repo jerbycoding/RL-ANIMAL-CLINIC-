@@ -12,7 +12,7 @@ router.get('/',async(req,res)=>{
         res.send(message.err);
     }
 })
-router.post('/owner',
+router.post('/',
     [
         body('name.first').notEmpty().withMessage('FirstName is Required'),
         body('name.last').notEmpty().withMessage('LastName is Required'),
@@ -41,13 +41,13 @@ router.post('/owner',
             res.status(500).json({message:"server error"});
         }
 });
-router.get('/owner/:id',async(req,res)=>{
+router.get('/:id',async(req,res)=>{
     const {id} = req.params;
     const owner = await ownerInformation.findById(id);
     res.status(200).json(owner)
 })
 
-router.put('/owner/:id', async(req,res)=>{
+router.put('/:id', async(req,res)=>{
     try{
         const {id} = req.params;
         const update = req.body;
@@ -59,7 +59,7 @@ router.put('/owner/:id', async(req,res)=>{
         return res.status(406).send({message: message.err});
     }
 })
-router.delete('/owner/:id', async (req,res)=>{
+router.delete('/:id', async (req,res)=>{
     try{
         const{id}=req.params
         await ownerInformation.findByIdAndDelete(id)
