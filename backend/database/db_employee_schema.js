@@ -16,9 +16,6 @@ const employeeSchema = new Schema(
             phone: { type: String, required: true, match: /^\d{10,15}$/ }, 
         },
 
-        associatedPatients: [
-            { type: Schema.Types.ObjectId, ref: 'patientInformation' }
-        ],
         dateHired: { type: Date, required: true }, 
         isActive: { type: Boolean, default: true }, 
         notes: { type: String, trim: true, default: '' }, 

@@ -1,5 +1,5 @@
 import express from 'express'
-import Inventory from './database/db_inventory_schema.js';
+import Inventory from '../../database/db_inventory_schema.js';
 const router = express.Router();
 router.get('/', async(req,res)=>{
     try{
@@ -81,3 +81,4 @@ router.delete('/:id', async(req,res)=>{
         return res.status(400).json({message: err.message})
     }
 })
+export default router

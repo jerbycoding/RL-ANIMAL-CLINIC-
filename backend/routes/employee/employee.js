@@ -1,65 +1,51 @@
-app.get('/owners',async(req,res)=>{
+import express from 'express'
+import Employee from '../../database/db_employee_schema.js'
+const router = express.Router();
+router.get('/', async(req,res)=>{
     try{
-        const owners = await ownerInformation.find({});
-        res.status(200).json({data :owners})
-
+        const employees = await Employee.find({});
+        return res.status(200).json({employees});
     }catch(err){
-        res.send(message.err);
+        return res.status(400).json({message: err.message});
     }
 })
-app.post('/owner',
-    [
-        body('name.first').notEmpty().withMessage('FirstName is Required'),
-        body('name.last').notEmpty().withMessage('LastName is Required'),
-        body('email').isEmail().withMessage('email Required'),
-        body('contactNumber').isNumeric().withMessage('contact number must be numeric'),
-        body('patients').isArray().optional(),
-        body('notes').isString().optional().withMessage('Notes must be String')
-    ]
-    ,async(req,res)=>{
-
-        const errors = validationResult(req);
-        if(!errors.isEmpty()){
-            return res.status(400).send(errors);
-        }   
-        try{
-            const data = req.body;
-            const ownerProfile = {
-                name:{ first: data.name.first, middle: data.name.middle, last: data.name.last},
-                contactInformation : { email : data.contactInformation.email, contactNumber : data.contactInformation.contactNumber},
-                patients :data.patients.map((value)=>{ return {_id : value}}),
-                notes: data.notes}
-            const owner = new ownerInformation(ownerProfile);
-            await owner.save()
-            return res.status(201).json({message: "Success"});
-        }catch(err){
-            res.status(500).json({message:"server error"});
-        }
-});
-app.get('/owner/:id',async(req,res)=>{
-    const {id} = req.params;
-    const owner = await ownerInformation.findById(id);
-    res.status(200).json(owner)
+router.post('/',async(req,res)=>{
+    try{
+        const data = req.body;
+        const employee= new Employee(data)
+        await employee.save()
+        return res.status(201).send('success');
+    }catch(err){
+        return res.status(400).json({message:err.message})
+    }
 })
-
-app.put('/owner/:id', async(req,res)=>{
+router.get('/:id',async(req,res)=>{
+    try{
+        const {id} =req.params
+        const employee = await Employee.findById(id)
+        return res.status(200).json(employee)
+    }catch(err){
+        return res.status(400).json({message:err.message});
+    }
+})
+router.put('/:id',async(req,res)=>{
     try{
         const {id} = req.params;
-        const update = req.body;
-        const updateProfile = await ownerInformation.findByIdAndUpdate(id,update);
-        if(!updateProfile){return res.status(404).json({message: 'Profile not found'})};
-
-        return res.status(200).json({message: 'Update Succesfully',data: updateProfile});
+        const data = req.body;
+        const update = await Employee.findByIdAndUpdate(id, data);
+        return res.status(200).send('hello world')
     }catch(err){
-        return res.status(406).send({message: message.err});
+        return res.status(400).send(err.message);
     }
 })
-app.delete('/owner/:id', async (req,res)=>{
+router.delete('/:id',async (req,res)=>{
     try{
-        const{id}=req.params
-        await ownerInformation.findByIdAndDelete(id)
-        return res.status(200).send('Delete Succesfully');
+        const {id}  = req.params;
+        const data = req.body;
+        await Employee.findByIdAndDelete(id)
+        return res.status(200).send('success');
     }catch(err){
-        return res.status(200).send(err.message)
+        return res.status(400).send('error');
     }
-}) 
+})
+export default router
