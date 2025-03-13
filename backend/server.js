@@ -1,8 +1,5 @@
 import express from 'express'
 import mongoose from 'mongoose'
-
-
-
 import patientRoute from './routes/patients/patient.js';
 import ownerRoute from './routes/owners/owners.js';
 import inventoriesRoute from './routes/inventories/inventories.js';
