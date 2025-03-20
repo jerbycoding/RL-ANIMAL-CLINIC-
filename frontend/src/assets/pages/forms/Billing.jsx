@@ -17,7 +17,7 @@ export default function InvoiceSystem() {
                     Description
                 </th>
                 <th scope="col" class="px-6 py-3">
-                    Quantity sssss
+                    Quantity 
                 </th>
                 <th scope="col" class="px-6 py-3">
                    Amount
