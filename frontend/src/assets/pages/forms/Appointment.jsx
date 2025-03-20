@@ -48,6 +48,7 @@ function CalendarApp() {
       <div className='flex'>
         <ScheduleXCalendar calendarApp={calendar}  />
         <div className='ml-2 mr-2 h-[90hv] rounded-md w-[450px] bg-green-500'>
+         
         </div>
       </div>
   
