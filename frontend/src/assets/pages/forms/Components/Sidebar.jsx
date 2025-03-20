@@ -3,7 +3,7 @@ import { Link, NavLink } from "react-router-dom";
 
 export default function Sidebar() {
   return (
-    <div className="w-64 bg-white dark:bg-gray-800 h-full p-4 shadow-lg">
+    <div className="w-64 bg-white dark:bg-gray-800 p-4 shadow-lg">
       <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">RL Clinic</h2>
       <ul className="space-y-2">
         <NavLink to="/" className="flex items-center gap-2 p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
@@ -11,12 +11,12 @@ export default function Sidebar() {
             <FaTachometerAlt /> Dashboard
         
         </NavLink>
-        <NavLink to="/PatientTable" className="flex items-center gap-2 p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
+        <NavLink to="/PatientManagement" className="flex items-center gap-2 p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
           
             <FaPaw /> Patient Management
         
         </NavLink>
-        <NavLink to="/Appointment"className="flex items-center gap-2 p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
+        <NavLink to="/Appointments"className="flex items-center gap-2 p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
            
             <FaCalendarAlt /> Appointments
        

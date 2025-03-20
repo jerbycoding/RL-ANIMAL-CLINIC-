@@ -1,62 +1,125 @@
-import { useState } from "react";
-import { Plus, Edit, Trash } from "lucide-react";
-
-const staffData = [
-  { id: 1, name: "John Doe", role: "Veterinarian", status: "Active" },
-  { id: 2, name: "Jane Smith", role: "Receptionist", status: "Inactive" },
-];
-
-export default function StaffManagement() {
-  const [staff, setStaff] = useState(staffData);
-  const [search, setSearch] = useState("");
-
+import { useState, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { CiEdit } from "react-icons/ci";
+import { MdOutlineDeleteForever } from "react-icons/md";
+import { AiOutlineFolderView } from "react-icons/ai";
+import { SiVirustotal } from "react-icons/si";
+export default function Attendance() {
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Staff Management</h1>
-      <div className="flex gap-2 mb-4">
-        <input
-          className="border p-2 rounded w-full"
-          placeholder="Search staff..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <button className="flex gap-2 bg-blue-500 text-white px-4 py-2 rounded">
-          <Plus size={16} /> Add Staff
-        </button>
-      </div>
-      <div className="bg-white shadow rounded-lg p-4">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="bg-gray-200">
-              <th className="p-2 border">ID</th>
-              <th className="p-2 border">Name</th>
-              <th className="p-2 border">Role</th>
-              <th className="p-2 border">Status</th>
-              <th className="p-2 border">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {staff
-              .filter((s) => s.name.toLowerCase().includes(search.toLowerCase()))
-              .map((s) => (
-                <tr key={s.id} className="border">
-                  <td className="p-2 border text-center">{s.id}</td>
-                  <td className="p-2 border">{s.name}</td>
-                  <td className="p-2 border">{s.role}</td>
-                  <td className="p-2 border">{s.status}</td>
-                  <td className="p-2 border flex gap-2 justify-center">
-                    <button className="p-1 bg-yellow-500 text-white rounded">
-                      <Edit size={14} />
-                    </button>
-                    <button className="p-1 bg-red-500 text-white rounded">
-                      <Trash size={14} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-      </div>
+    <div className="p-6 bg-gray-100 dark:bg-gray-900 min-h-screen">
+    <div className="grid grid-cols-6 gap-4">
+    <div class="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 col-span flex justify-evenly">
+       <div>Total Staff</div>
+        <div>9</div>
     </div>
+    <div class="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 col-span flex justify-evenly">
+    <div>Active Staff</div>
+    <div>9</div>
+    </div>
+    <div class="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700 col-span flex justify-evenly">
+    <div>On Leave</div>
+    <div>9</div>
+    </div>
+    <div class="relative shadow-md sm:rounded-lg  col-span-6">
+        <div className="flex justify-between mb-3">
+            <h1 className="text-3xl font-bold">Profiles</h1>
+            <div>
+                <Button>Add Profile</Button>
+            </div>
+        </div>
+        <div className="overflow-y-scroll max-h-[300px]">
+        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+            <thead class="text-xs text-gray-700 uppercase dark:text-gray-400">
+                <tr>
+                    <th scope="col" class="px-6 py-3 bg-gray-50 dark:bg-gray-800">
+                        ID
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Name
+                    </th>
+                    <th scope="col" class="px-6 py-3 bg-gray-50 dark:bg-gray-800">
+                        Role
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                    Status
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                    Shift Time
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                    Contact
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                    Action
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+            
+                
+                <tr class="border-b border-gray-200 dark:border-gray-700">
+                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-gray-800">
+                    1
+                    </th>
+                    <td class="px-6 py-4">
+                        Hans Jerby B De Lana
+                    </td>
+                    <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">
+                        Veterinarian
+                    </td>
+                    <td class="px-6 py-4">
+                        Active
+                    </td>
+                    <td class="px-6 py-4">
+                        09:00-17:00
+                    </td>
+                    <td class="px-6 py-4">
+                        1234-567-8910
+                    </td>
+                    <td class="px-6 py-4 flex">
+                    <CiEdit className="text-3xl"/>
+                    <MdOutlineDeleteForever className="text-3xl"/>
+                    <AiOutlineFolderView  className="text-3xl"/>
+                    </td>
+                </tr>
+                <tr class="border-b border-gray-200 dark:border-gray-700">
+                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap bg-gray-50 dark:text-white dark:bg-gray-800">
+                    1
+                    </th>
+                    <td class="px-6 py-4">
+                        Hans Jerby B De Lana
+                    </td>
+                    <td class="px-6 py-4 bg-gray-50 dark:bg-gray-800">
+                        Veterinarian
+                    </td>
+                    <td class="px-6 py-4">
+                        Active
+                    </td>
+                    <td class="px-6 py-4">
+                        09:00-17:00
+                    </td>
+                    <td class="px-6 py-4">
+                        1234-567-8910
+                    </td>
+                    <td class="px-6 py-4 flex">
+                    <CiEdit className="text-3xl"/>
+                    <MdOutlineDeleteForever className="text-3xl"/>
+                    <AiOutlineFolderView  className="text-3xl"/>
+                    </td>
+                </tr>
+            
+                
+                
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    </div>
+  </div>
+
+
   );
 }

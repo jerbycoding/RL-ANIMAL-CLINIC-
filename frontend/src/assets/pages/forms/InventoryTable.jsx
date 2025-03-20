@@ -1,141 +1,126 @@
-import React, { useState } from "react";
-import { Pencil, Trash, Plus } from "lucide-react";
-
-const sampleInventory = [...Array(20)].map((_, index) => ({
-  id: index + 1,
-  itemName: `Item ${index + 1}`,
-  category: index % 2 === 0 ? "Medicine" : "Food",
-  quantity: Math.floor(Math.random() * 50) + 1,
-  unit: index % 2 === 0 ? "bottle" : "kg",
-  pricePerUnit: (Math.random() * 50 + 10).toFixed(2),
-  expirationDate: index % 2 === 0 ? "2025-06-15" : "N/A",
-  supplier: { name: "Vet Supplies Co.", contactNumber: "123-456-7890" },
-  notes: index % 2 === 0 ? "Prescription required" : "Grain-free",
-}));
+import React from 'react'
+import {Input} from '@/components/ui/input';
+import {Button} from '@/components/ui/button';
+import { MdPets } from "react-icons/md";
+import { IoSearch } from "react-icons/io5";
 
 const InventoryTable = () => {
-  const [inventory, setInventory] = useState(sampleInventory);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [editItem, setEditItem] = useState(null);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState(null);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [newItem, setNewItem] = useState({
-    itemName: "",
-    category: "",
-    quantity: "",
-    unit: "",
-    pricePerUnit: "",
-    expirationDate: "",
-    supplier: { name: "", contactNumber: "" },
-    notes: "",
-  });
-
-  const handleDelete = (id) => {
-    setShowDeleteConfirm(true);
-    setItemToDelete(id);
-  };
-
-  const confirmDelete = () => {
-    setInventory(inventory.filter((item) => item.id !== itemToDelete));
-    setShowDeleteConfirm(false);
-    setItemToDelete(null);
-  };
-
-  const handleSave = () => {
-    setInventory(inventory.map((item) => (item.id === editItem.id ? editItem : item)));
-    setEditItem(null);
-  };
-
-  const handleAddItem = () => {
-    setInventory([...inventory, { ...newItem, id: inventory.length + 1 }]);
-    setShowAddModal(false);
-    setNewItem({
-      itemName: "",
-      category: "",
-      quantity: "",
-      unit: "",
-      pricePerUnit: "",
-      expirationDate: "",
-      supplier: { name: "", contactNumber: "" },
-      notes: "",
-    });
-  };
-
-  return (
-    <div className="p-4 bg-white rounded-lg shadow-lg">
-      <div className="flex justify-between mb-4  ">
-        <h2 className="text-2xl font-bold">Veterinary Inventory</h2>
-        <button className="bg-green-500 text-white px-4 py-2 rounded flex items-center" onClick={() => setShowAddModal(true)}>
-          <Plus size={16} className="mr-2" /> Add Item
-        </button>
-      </div>
-
-      <input
-        type="text"
-        placeholder="Search..."
-        className="w-full p-2 mb-4 border rounded"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-
-      <div className="overflow-auto max-h-[680px] border rounded-lg">
-        <table className="w-full border-collapse border border-gray-300">
-          <thead className="bg-gray-200 sticky -top-1">
-            <tr>
-              <th className="border p-2 ">Item Name</th>
-              <th className="border p-2">Category</th>
-              <th className="border p-2">Quantity</th>
-              <th className="border p-2">Unit</th>
-              <th className="border p-2">Price ($)</th>
-              <th className="border p-2">Expiration Date</th>
-              <th className="border p-2">Supplier</th>
-              <th className="border p-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {inventory.map((item) => (
-              <tr key={item.id} className="border">
-                <td className="border p-2">{item.itemName}</td>
-                <td className="border p-2">{item.category}</td>
-                <td className="border p-2">{item.quantity}</td>
-                <td className="border p-2">{item.unit}</td>
-                <td className="border p-2">${item.pricePerUnit}</td>
-                <td className="border p-2">{item.expirationDate}</td>
-                <td className="border p-2">{item.supplier.name}</td>
-                <td className="border p-2 flex gap-2 justify-center">
-                  <button className="text-blue-500" onClick={() => setEditItem(item)}>
-                    <Pencil size={16} />
-                  </button>
-                  <button className="text-red-500" onClick={() => handleDelete(item.id)}>
-                    <Trash size={16} />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {editItem && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-4 rounded shadow-lg">
-            <h3 className="text-lg font-bold">Edit Item</h3>
-            <input
-              type="text"
-              value={editItem.itemName}
-              onChange={(e) => setEditItem({ ...editItem, itemName: e.target.value })}
-              className="w-full p-2 border rounded mt-2"
-            />
-            <div className="flex justify-end mt-4">
-              <button className="mr-2 px-4 py-2 bg-gray-300 rounded" onClick={() => setEditItem(null)}>Cancel</button>
-              <button className="px-4 py-2 bg-blue-500 text-white rounded" onClick={handleSave}>Save</button>
+  return(
+    <div> 
+            <div>
+                 <h1 className='text-3xl font-bold mb-5'>Patient Management</h1>
             </div>
-          </div>
-        </div>
-      )}
+           
+            <div className='flex justify-between items-center'>
+                
+                <div className="relative w-[800px]">
+                    <IoSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl" />
+                    <Input
+                    className="pl-10 w-full bg-white border-gray-300"
+                     placeholder="Search Name or ID"/>
+                </div>
+                <div>
+                    <Button><MdPets /> Medicine</Button>
+                    <Button><MdPets /> Food</Button>
+                    <Button><MdPets /> Equipment</Button>
+                    <Button><MdPets /> Supplies</Button>
+                    <Button><MdPets /> Other</Button>
+                    <Button><MdPets /> Add</Button>
+                </div>
+            </div>
+    
+           <div className='mt-5'>
+    
+    
+           <div class="relative shadow-md sm:rounded-lg h-[650px] ">
+                <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400  overflow-y-auto">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400  ">
+                <tr>
+                    <th scope="col" class="px-6 py-3 text-center">
+                        Name
+                    </th>
+
+                    <th scope="col" class="px-6 py-3 text-center">
+                        Batch Number
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-center">
+                        Quantity
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-center">
+                        Unit
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-center">
+                        Price
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-center">
+                        Stock
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-center">
+                        Action
+                    </th>
+
+                    
+                </tr>
+            </thead>
+            <tbody>
+                
+            <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
+                       DOG FOOD
+                    </th>
+
+                    <td class="px-6 py-4 text-center">
+                      DEC-21
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        19
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        Kg
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        900
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        50
+                    </td>
+                    <td class="px-6 py-4 text-center">
+                        <a href="#" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
+                    </td>
+                </tr>
+    
+                
+            </tbody>
+        </table>
+        
     </div>
-  );
+    
+    </div>
+    <div class="flex flex-row items-center justify-between">    
+        <span class="text-sm text-gray-700 dark:text-gray-300">       
+            Showing <span class="font-semibold text-gray-900 dark:text-white">1</span> to 
+            <span class="font-semibold text-gray-900 dark:text-white">10</span> of 
+            <span class="font-semibold text-gray-900 dark:text-white">100</span> Entries   
+        </span>   
+        <div class="inline-flex mt-2 xs:mt-0 items-center">        
+            <button class="flex items-center justify-center px-3 h-8 text-sm font-medium text-white bg-gray-800 rounded-s hover:bg-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white">         
+                <svg class="w-3.5 h-3.5 me-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">           
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5H1m0 0 4 4M1 5l4-4"/>
+                </svg>         
+                Prev     
+            </button>     
+            <button class="flex items-center justify-center px-3 h-8 text-sm font-medium text-white bg-gray-800 border-0 border-s border-gray-700 rounded-e hover:bg-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white ml-2">         
+                Next         
+                <svg class="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">         
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+                </svg>     
+            </button>   
+        </div> 
+    </div>  
+    
+    </div>
+  )
 };
+
 
 export default InventoryTable;

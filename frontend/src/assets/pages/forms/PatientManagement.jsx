@@ -1,0 +1,103 @@
+import React from 'react'
+import {Input} from '@/components/ui/input';
+import {Button} from '@/components/ui/button';
+import { MdPets } from "react-icons/md";
+import { IoSearch } from "react-icons/io5";
+
+function PatientManagement() {
+    
+
+  return (
+    <div > 
+        <div>
+             <h1 className='text-3xl font-bold mb-5'>Patient Management</h1>
+        </div>
+       
+        <div className='flex justify-between items-center'>
+            
+            <div className="relative w-[800px]">
+                <IoSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl" />
+                <Input
+                className="pl-10 w-full bg-white border-gray-300"
+                 placeholder="Search Name or ID"/>
+            </div>
+            <div>
+                <Button><MdPets /> Add</Button>
+            </div>
+        </div>
+
+       <div className='mt-5'>
+
+
+       <div class="relative shadow-md sm:rounded-lg h-[650px] ">
+            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400  overflow-y-auto">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400  ">
+            <tr>
+                <th scope="col" class="px-6 py-3 text-center">
+                    Patient ID
+                </th>
+                <th scope="col" class="px-6 py-3 text-center">
+                    Name
+                </th>
+                <th scope="col" class="px-6 py-3 text-center">
+                    Contact Number
+                </th>
+
+                <th scope="col" class="px-6 py-3 text-center">
+                    Action
+                </th>
+                
+            </tr>
+        </thead>
+        <tbody>
+            
+        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+                <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
+                   PDID-001
+                </th>
+                <td class="px-6 py-4 text-center">
+                    CHICHI
+                </td>
+                <td class="px-6 py-4 text-center">
+                    0994-607-2368
+                </td>
+
+                <td class="px-6 py-4 text-center">
+                    <a href="#" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
+                </td>
+            </tr>
+
+            
+        </tbody>
+    </table>
+    
+</div>
+
+</div>
+<div class="flex flex-row items-center justify-between">    
+    <span class="text-sm text-gray-700 dark:text-gray-300">       
+        Showing <span class="font-semibold text-gray-900 dark:text-white">1</span> to 
+        <span class="font-semibold text-gray-900 dark:text-white">10</span> of 
+        <span class="font-semibold text-gray-900 dark:text-white">100</span> Entries   
+    </span>   
+    <div class="inline-flex mt-2 xs:mt-0 items-center">        
+        <button class="flex items-center justify-center px-3 h-8 text-sm font-medium text-white bg-gray-800 rounded-s hover:bg-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white">         
+            <svg class="w-3.5 h-3.5 me-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">           
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5H1m0 0 4 4M1 5l4-4"/>
+            </svg>         
+            Prev     
+        </button>     
+        <button class="flex items-center justify-center px-3 h-8 text-sm font-medium text-white bg-gray-800 border-0 border-s border-gray-700 rounded-e hover:bg-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white ml-2">         
+            Next         
+            <svg class="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">         
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+            </svg>     
+        </button>   
+    </div> 
+</div>  
+
+</div>
+  )
+}
+
+export default PatientManagement
