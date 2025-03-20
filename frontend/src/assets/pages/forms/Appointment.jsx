@@ -27,8 +27,7 @@ function CalendarApp() {
         title: 'ChiChi',
         start: '2025-03-20 00:00',
         end: '2025-03-20 01:00',
-        description:'Clinic',
-
+        description:'Clinic';
       }
     
     ],
