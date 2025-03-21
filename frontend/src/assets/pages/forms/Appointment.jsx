@@ -46,50 +46,49 @@ function CalendarApp() {
  
   return (
 
-      
-      <div className='flex'>
-        <ScheduleXCalendar calendarApp={calendar}  />
-        <div className='ml-2 mr-2 pt-5 h-[90hv] rounded-md w-[450px]'>
-          <h1 className='text-3xl text-center'>APPOINTMENT</h1>
-          <div>
-            <p>NAME OF THE PATIENT</p>
-            <Input></Input>
-          </div>
-          <div>
-            <p>PURPOSE</p>
-            <Input></Input>
+      <div>
+
+   
+        <div className='flex '>
+          <div className='mr-10'>
+            <ScheduleXCalendar calendarApp={calendar}  className="col-span-1"/>
           </div>
 
-          <div>
+          <div className='mr-2  p-5 h-[90hv] rounded-md w-[400px] col-span-1 bg-white '>
+            <h1 className='text-3xl text-center mb-5 font-bold'>APPOINTMENT</h1>
+            <div>
+              <p className='text-2xl font-bold'>NAME OF THE PATIENT</p>
+              <Input></Input>
+            </div>
+            <div>
+            <p className='text-2xl font-bold'>PURPOSE</p>
+              <Input></Input>
+            </div>
+            <div>
+            </div>
+            <div>
+            <p className='text-2xl font-bold'>TIME</p>
+              <Input type="date"></Input>
+            </div>
+            <div>
+            <p className='text-2xl font-bold'>START</p>
+              <Input type="time"></Input>
+            </div>
+            <div>
+            <p className='text-2xl font-bold'>END</p>
+              <Input type="time"></Input>
+            </div>
+            
 
+            <div className='flex mt-5 justify-between'>
+              <Button>PROCEED</Button>
+              <Button>Reset</Button>
+            </div>
           </div>
-          <div>
-            <p>Time</p>
-            <Input type="date"></Input>
-          </div>
-          <div>
-            <p>Start</p>
-            <Input type="time"></Input>
-          </div>
-          <div>
-            <p>End</p>
-            <Input type="time"></Input>
-          </div>
-          
-          <div>
-            <p>Description</p>
-            <Input></Input>
-          </div>
-          <div className='flex'>
-            <Button>PROCEED</Button>
-            <Button>Reset</Button>
-          </div>
-
-
-          
+        
         </div>
+
       </div>
-  
     
   )
 }
