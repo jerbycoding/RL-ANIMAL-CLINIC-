@@ -3,14 +3,14 @@ import Sidebar from "./Components/Sidebar";
 import {Routes, Route} from 'react-router-dom'
 // 
 import PatientManagement from "./PatientManagement";
-import PatientTable from "./PatientTable";
+
 import ContinousCalendar from './Appointment'
 import InventoryTable from "./InventoryTable";
 import StaffManagement from "./StaffManagement";
 import POSBilling from "./Billing";
 export default function Dashboard() {
   return (
-    <div className="flex flex-col min-h-[100vh] bg-gray-100 dark:bg-gray-900 ">
+    <div className="flex flex-col min-h-[100vh] bg-gray-100 dark:bg-gray-900">
       <Topbar />
       <div className="flex flex-1 ">
         <Sidebar />
