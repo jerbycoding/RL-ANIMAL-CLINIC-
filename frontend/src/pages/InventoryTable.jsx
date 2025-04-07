@@ -1,14 +1,18 @@
-import React from 'react'
+import React,{useState} from 'react'
 import {Input} from '@/components/ui/input';
 import {Button} from '@/components/ui/button';
 import { MdPets } from "react-icons/md";
 import { IoSearch } from "react-icons/io5";
+import InventoryModal from './Modal/InventoryModal';
+import EditItemModal from './Modal/EditInventoryModal';
 
-const InventoryTable = () => {
+const InventoryTable = () => {  
+    const [openModal, setOpenModal] = useState(false);
+    const [openEdit, setOpenEdit] = useState(false);
   return(
     <div> 
             <div>
-                 <h1 className='text-3xl font-bold mb-5'>Patient Management</h1>
+                 <h1 className='text-3xl font-bold mb-5'>INVENTORY</h1>
             </div>
            
             <div className='flex justify-between items-center'>
@@ -18,21 +22,17 @@ const InventoryTable = () => {
                     <Input
                     className="pl-10 w-full bg-white border-gray-300"
                      placeholder="Search Name or ID"/>
+     
                 </div>
-                <div>
-                    <Button><MdPets /> Medicine</Button>
-                    <Button><MdPets /> Food</Button>
-                    <Button><MdPets /> Equipment</Button>
-                    <Button><MdPets /> Supplies</Button>
-                    <Button><MdPets /> Other</Button>
-                    <Button><MdPets /> Add</Button>
+                <div className=''>
+                    <Button onClick={()=>{setOpenModal(true)}}><MdPets /> Add</Button>
                 </div>
             </div>
     
            <div className='mt-5'>
+
     
-    
-           <div className="relative shadow-md sm:rounded-lg h-[650px] ">
+           <div className="relative shadow-md sm:rounded-lg min-h-[600px] ">
                 <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400  overflow-y-auto">
                 <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400  ">
                 <tr>
@@ -56,15 +56,15 @@ const InventoryTable = () => {
                         Stock
                     </th>
                     <th scope="col" className="px-6 py-3 text-center">
-                        Action
+                       Type
                     </th>
-
-                    
+                    <th scope="col" className="px-6 py-3 text-center">
+                        Action
+                    </th>    
                 </tr>
             </thead>
             <tbody>
-                
-            <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
+                <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
                     <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
                        DOG FOOD
                     </th>
@@ -85,11 +85,12 @@ const InventoryTable = () => {
                         50
                     </td>
                     <td className="px-6 py-4 text-center">
-                        <a href="#" className="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
+                        Food
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                        <Button onClick={()=>{setOpenEdit(true)}}>Edit</Button>
                     </td>
                 </tr>
-    
-                
             </tbody>
         </table>
         
@@ -117,8 +118,11 @@ const InventoryTable = () => {
             </button>   
         </div> 
     </div>  
-    
+    {openModal && <InventoryModal onClose={()=>{setOpenModal(false)}} />}
+
+    {openEdit && <EditItemModal onClose={()=>{setOpenEdit(false)}} />}
     </div>
+   
   )
 };
 

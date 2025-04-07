@@ -16,6 +16,12 @@ export default function Sidebar() {
             <FaPaw /> Patient Management
         
         </NavLink>
+        <NavLink to="/Checkup" className="flex items-center gap-2 p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
+          
+          <FaPaw /> Check Up
+      
+      </NavLink>
+ 
         <NavLink to="/Appointments"className="flex items-center gap-2 p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
            
             <FaCalendarAlt /> Appointments
