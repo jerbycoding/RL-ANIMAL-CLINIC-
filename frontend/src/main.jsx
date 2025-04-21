@@ -9,9 +9,9 @@ createRoot(document.getElementById('root')).render(
   
   <StrictMode>
     <SnackbarProvider>
-    <Router>
+
     <App />
-    </Router>
+
     </SnackbarProvider>
 
   </StrictMode>,

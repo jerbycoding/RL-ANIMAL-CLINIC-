@@ -1,61 +1,131 @@
-import React from "react";
-import { Button } from "@/components/ui/button";
-import { IoClose } from "react-icons/io5";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-export default function EditItemModal({ onClose }) {
+import React, { useState } from "react";
 
+const EditInventoryModal = ({ isOpen, onClose, item, onUpdate }) => {
+  const [formData, setFormData] = useState(item);
+
+  if (!isOpen || !item) return null;
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onUpdate(formData);
+    onClose();
+  };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-[500px] relative">
-        {/* Modal Header */}
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">ITEM</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-800">
-            <IoClose className="text-2xl" />
-          </button>
-        </div>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+      <div className="bg-white rounded-lg shadow-lg p-6 max-w-lg w-full">
+        <h2 className="text-2xl font-bold mb-4 text-gray-800">Edit {item.name}</h2>
 
-        {/* Modal Content */}
-        <div className="mb-4">
-          <Label>
-            Name
-            <Input></Input>
-          </Label>
-          <Label>
-            Batch 
-            Number
-            <Input></Input>
-          </Label>
-          <Label>
-            Unit
-            <Input></Input>
-          </Label>
-          <Label>
-            Price
-            <Input type="number"></Input>
-          </Label>
-          <Label>
-            Stock
-            <Input type="number"></Input>
-          </Label>
-          <Label>
-            <p>Type</p>
-                 <select id="cars" name="cars" className="p-1 w-[200px] text-center">
-                     <option value="food">Food</option>
-                     <option value="medicine">Medicine</option>
-                 </select>
-          </Label>            
-     
-        </div>
+        <form onSubmit={handleSubmit}>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Item Name</label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-lg mb-4"
+                required
+              />
+            </div>
 
-        {/* Modal Footer */}
-        <div className="flex justify-end gap-2">
-          <Button onClick={onClose} className="bg-gray-300 text-black">Close</Button>
-          <Button className="bg-blue-500 text-white">Confirm</Button>
-        </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Category</label>
+              <select
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-lg mb-4"
+                required
+              >
+                <option value="Medicine">Medicine</option>
+                <option value="Dog Food">Dog Food</option>
+                <option value="Vaccines">Vaccines</option>
+                <option value="Surgical Supplies">Surgical Supplies</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Quantity</label>
+              <input
+                type="number"
+                name="quantity"
+                value={formData.quantity}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-lg mb-4"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Unit Price</label>
+              <input
+                type="number"
+                name="unitPrice"
+                value={formData.unitPrice}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-lg mb-4"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Supplier</label>
+              <input
+                type="text"
+                name="supplier"
+                value={formData.supplier}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-lg mb-4"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Expiration Date</label>
+              <input
+                type="date"
+                name="expirationDate"
+                value={formData.expirationDate}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-lg mb-4"
+              />
+            </div>
+          </div>
+
+          <label className="block text-sm font-medium text-gray-700">Notes</label>
+          <textarea
+            name="notes"
+            value={formData.notes}
+            onChange={handleChange}
+            className="w-full p-2 border border-gray-300 rounded-lg mb-4"
+          ></textarea>
+
+          <div className="mt-6 flex justify-end gap-4">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600"
+            >
+              Save Changes
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );
-}
+};
+
+export default EditInventoryModal;

@@ -10,7 +10,7 @@ function PatientDiagnosticExam() {
   };
 
   return (
-    <div className="  p-6 bg-white shadow-lg rounded-lg">
+    <div className="  ">
       {/* Header Buttons */}
       <div className=" mb-6 space-x-4 ">
         <button
@@ -41,10 +41,8 @@ function PatientDiagnosticExam() {
           <PhysicalExamForm />
         )}
         {activeSection === "Laboratory/Diagnostic" && (
-          <div className="p-4 bg-gray-100 rounded-md shadow-md">
-            <h3 className="text-lg font-semibold text-gray-800 mb-2">
-              Laboratory/Diagnostic Section
-            </h3>
+          <div className=" bg-gray-100 rounded-md shadow-md">
+
 
                 <TestForm></TestForm>
 

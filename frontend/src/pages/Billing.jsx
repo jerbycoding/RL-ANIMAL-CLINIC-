@@ -28,9 +28,7 @@ export default function InvoiceSystem() {
     const removeServices =()=>{
         setServices(services.slice(0,-1));
     }
-    const resetItem = ()=>{
-        
-    }
+
     useEffect(() => {
         if (isMounted.current) {
           console.log("Updated items:", items);

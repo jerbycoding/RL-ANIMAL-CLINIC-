@@ -1,130 +1,177 @@
-import React,{useState} from 'react'
-import {Input} from '@/components/ui/input';
-import {Button} from '@/components/ui/button';
-import { MdPets } from "react-icons/md";
-import { IoSearch } from "react-icons/io5";
-import InventoryModal from './Modal/InventoryModal';
-import EditItemModal from './Modal/EditInventoryModal';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import AddInventoryModal from "./Modal/AddInventoryModal";
+import ViewInventoryModal from "./Modal/ViewInventoryModal";
+import EditInventoryModal from "./Modal/EditInventoryModal";
+import DeleteInventoryModal from "./Modal/DeleteInventoryModal";
+const InventoryTable = () => {
+  const [inventory, setInventory] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isAdding, setIsAdding] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isViewing, setIsViewing] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
-const InventoryTable = () => {  
-    const [openModal, setOpenModal] = useState(false);
-    const [openEdit, setOpenEdit] = useState(false);
-  return(
-    <div> 
-            <div>
-                 <h1 className='text-3xl font-bold mb-5'>INVENTORY</h1>
-            </div>
-           
-            <div className='flex justify-between items-center'>
-                
-                <div className="relative w-[800px]">
-                    <IoSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl" />
-                    <Input
-                    className="pl-10 w-full bg-white border-gray-300"
-                     placeholder="Search Name or ID"/>
-     
-                </div>
-                <div className=''>
-                    <Button onClick={()=>{setOpenModal(true)}}><MdPets /> Add</Button>
-                </div>
-            </div>
-    
-           <div className='mt-5'>
+  useEffect(() => {
+    const fetchInventory = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/inventory"); // API endpoint
+        setInventory(response.data);
+      } catch (error) {
+        console.error("Error fetching inventory:", error);
+      }
+    };
 
-    
-           <div className="relative shadow-md sm:rounded-lg min-h-[600px] ">
-                <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400  overflow-y-auto">
-                <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400  ">
-                <tr>
-                    <th scope="col" className="px-6 py-3 text-center">
-                        Name
-                    </th>
+    fetchInventory();
+  }, []);
 
-                    <th scope="col" className="px-6 py-3 text-center">
-                        Batch Number
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-center">
-                        Quantity
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-center">
-                        Unit
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-center">
-                        Price
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-center">
-                        Stock
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-center">
-                       Type
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-center">
-                        Action
-                    </th>    
-                </tr>
-            </thead>
-            <tbody>
-                <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
-                    <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white text-center">
-                       DOG FOOD
-                    </th>
+  // Filter inventory items based on the search query
+  const filteredInventory = inventory.filter((item) =>
+    item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    item.category.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  const handleAddItem = async (newItem) => {
+    try {
+      const response = await axios.post("http://localhost:5000/inventory", newItem);
+      setInventory((prev) => [...prev, response.data]); // Update state with new item
+      alert("Item added successfully!");
+      setIsAdding(false); 
+    } catch (error) {
+      console.error("Error adding item:", error);
+      alert("Failed to add item.");
+    }
+  };
 
-                    <td className="px-6 py-4 text-center">
-                      DEC-21
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                        19
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                        Kg
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                        900
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                        50
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                        Food
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                        <Button onClick={()=>{setOpenEdit(true)}}>Edit</Button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-        
+  const handleUpdateItem = async (updatedItem) => {
+    try {
+      await axios.put(`http://localhost:5000/inventory/${updatedItem._id}`, updatedItem);
+      setInventory(
+        inventory.map((item) => (item._id === updatedItem._id ? updatedItem : item))
+      );
+      alert("Item updated successfully!");
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error updating item:", error);
+      alert("Failed to update item.");
+    }
+  };
+
+
+  // Delete an inventory item
+  const handleDeleteItem = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5000/inventory/${id}`);
+      setInventory((prev) => prev.filter((item) => item._id !== id));
+      alert("Item deleted successfully!");
+      setIsDeleting(false);
+    } catch (error) {
+      console.error("Error deleting item:", error);
+      alert("Failed to delete item.");
+    }
+  };
+
+
+
+
+  return (
+    <div className=" mx-auto p-6    rounded-lg">
+      <h1 className="text-2xl font-bold mb-6 text-gray-800">Inventory</h1>
+    <div className="flex gap-2">
+
+
+      {/* Search Bar */}
+        <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search by name or category..."
+            className="p-2 border border-gray-300 rounded-lg w-full mb-4"
+        />
+             <button
+        onClick={() => setIsAdding(true)}
+        className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 mb-4"
+      >
+        Add Item
+      </button>
+
+      </div >
+      <div className="mt-5">
+  <div className="relative shadow-md sm:rounded-lg min-h-[750px] overflow-y-scroll">
+    <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 border border-gray-200">
+      <thead className="text-xs text-gray-700 uppercase bg-blue-50 dark:bg-gray-700 dark:text-gray-400 sticky top-0">
+        <tr>
+          <th className="px-6 py-3 text-center">Item Name</th>
+          <th className="px-6 py-3 text-center">Category</th>
+          <th className="px-6 py-3 text-center">Quantity</th>
+          <th className="px-6 py-3 text-center">Unit Price</th>
+          <th className="px-6 py-3 text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {filteredInventory.map((item, index) => (
+          <tr
+            key={item._id}
+            className={
+              index % 2 === 0
+                ? "bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200"
+                : "bg-gray-50 border-b dark:bg-gray-700 dark:border-gray-700 border-gray-200"
+            }
+          >
+            <td className="px-6 py-4 text-center">{item.name}</td>
+            <td className="px-6 py-4 text-center">{item.category}</td>
+            <td className="px-6 py-4 text-center">{item.quantity}</td>
+            <td className="px-6 py-4 text-center">{item.unitPrice}</td>
+            <td className="px-6 py-4 text-center flex justify-center gap-x-3">
+              <button
+                className="bg-yellow-500 text-white px-3 py-1 rounded-md hover:bg-yellow-600"
+                onClick={() => {
+                  setSelectedItem(item);
+                  setIsViewing(true);
+                }}
+              >
+                View
+              </button>
+              <button
+                className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600"
+                onClick={() => {
+                  setSelectedItem(item);
+                  setIsEditing(true);
+                }}
+              >
+                Edit
+              </button>
+              <button
+                className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600"
+                onClick={() => {
+                  setSelectedItem(item);
+                  setIsDeleting(true);
+                }}
+              >
+                Delete
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+      { isAdding &&<AddInventoryModal isOpen={isAdding} onClose={() => setIsAdding(false)} onAdd={handleAddItem} />}
+      {isViewing&&<ViewInventoryModal isOpen={isViewing} onClose={() => setIsViewing(false)} item={selectedItem} />}
+      {isEditing&&<EditInventoryModal isOpen={isEditing} onClose={() => setIsEditing(false)} item={selectedItem} onUpdate={handleUpdateItem} />}
+      <DeleteInventoryModal
+        isOpen={isDeleting}
+        onClose={() => setIsDeleting(false)}
+        item={selectedItem}
+        onDelete={handleDeleteItem}
+      />
+
+
+
     </div>
-    
-    </div>
-    <div className="flex flex-row items-center justify-between">    
-        <span className="text-sm text-gray-700 dark:text-gray-300">       
-            Showing <span className="font-semibold text-gray-900 dark:text-white">1</span> to 
-            <span className="font-semibold text-gray-900 dark:text-white">10</span> of 
-            <span className="font-semibold text-gray-900 dark:text-white">100</span> Entries   
-        </span>   
-        <div className="inline-flex mt-2 xs:mt-0 items-center">        
-            <button className="flex items-center justify-center px-3 h-8 text-sm font-medium text-white bg-gray-800 rounded-s hover:bg-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white">         
-                <svg className="w-3.5 h-3.5 me-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">           
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5H1m0 0 4 4M1 5l4-4"/>
-                </svg>         
-                Prev     
-            </button>     
-            <button className="flex items-center justify-center px-3 h-8 text-sm font-medium text-white bg-gray-800 border-0 border-s border-gray-700 rounded-e hover:bg-gray-900 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white ml-2">         
-                Next         
-                <svg className="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">         
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
-                </svg>     
-            </button>   
-        </div> 
-    </div>  
-    {openModal && <InventoryModal onClose={()=>{setOpenModal(false)}} />}
-
-    {openEdit && <EditItemModal onClose={()=>{setOpenEdit(false)}} />}
-    </div>
-   
-  )
+  );
 };
-
 
 export default InventoryTable;

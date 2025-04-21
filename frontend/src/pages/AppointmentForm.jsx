@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 
 const AppointmentForm = () => {
@@ -11,23 +11,39 @@ const AppointmentForm = () => {
     purpose: "",
     notes: ""
   });
+
   const [patients, setPatients] = useState([]);
   const [vets, setVets] = useState([]);
   const [message, setMessage] = useState("");
 
-  // Fetch Patients and Veterinarians
+  const [searchPatient, setSearchPatient] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef();
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const patientResponse = await axios.get("http://localhost:5000/patients");
         const vetResponse = await axios.get("http://localhost:5000/staff");
         setPatients(patientResponse.data);
-        setVets(vetResponse.data.filter((staff) => staff.role === "Veterinarian")); // Filter vets only
+        setVets(vetResponse.data.filter((staff) => staff.role === "Veterinarian"));
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   const handleChange = (e) => {
@@ -36,9 +52,8 @@ const AppointmentForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      const response = await axios.post("http://localhost:5000/appointments", formData);
+      await axios.post("http://localhost:5000/appointments", formData);
       setMessage("Appointment created successfully!");
       setFormData({
         patient: "",
@@ -48,7 +63,8 @@ const AppointmentForm = () => {
         endTime: "",
         purpose: "",
         notes: ""
-      }); // Reset form
+      });
+      setSearchPatient("");
     } catch (error) {
       console.error("Error creating appointment:", error);
       setMessage("Failed to create appointment. Please try again.");
@@ -59,7 +75,6 @@ const AppointmentForm = () => {
     <div className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-lg">
       <h1 className="text-2xl font-bold mb-6 text-gray-800">Create Appointment</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Display Response Message */}
         {message && (
           <div
             className={`p-3 rounded-md ${
@@ -70,24 +85,55 @@ const AppointmentForm = () => {
           </div>
         )}
 
-        {/* Patient Dropdown */}
-        <label className="block text-sm font-medium text-gray-700">Select Patient</label>
-        <select
-          name="patient"
-          value={formData.patient}
-          onChange={handleChange}
-          required
-          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="">Choose Patient</option>
-          {patients.map((patient) => (
-            <option key={patient._id} value={patient._id}>
-              {patient.name}
-            </option>
-          ))}
-        </select>
+        {/* Searchable Text Input for Patient */}
+        <label className="block text-sm font-medium text-gray-700">Search Patient</label>
+        <div className="relative" ref={dropdownRef}>
+          <input
+            type="text"
+            placeholder="Type patient or owner name..."
+            value={searchPatient}
+            onChange={(e) => {
+              setSearchPatient(e.target.value);
+              setShowDropdown(true);
+              setFormData({ ...formData, patient: "" }); // Clear selected patient on input change
+            }}
+            onFocus={() => setShowDropdown(true)}
+            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            required
+          />
+          {showDropdown && searchPatient && (
+            <ul className="absolute z-10 w-full bg-white border rounded shadow max-h-48 overflow-y-auto">
+              {patients
+                .filter(
+                  (p) =>
+                    p.name.toLowerCase().includes(searchPatient.toLowerCase()) ||
+                    p.owner.name.toLowerCase().includes(searchPatient.toLowerCase())
+                )
+                .map((p) => (
+                  <li
+                    key={p._id}
+                    onClick={() => {
+                      setFormData({ ...formData, patient: p._id });
+                      setSearchPatient(`${p.name} - ${p.owner.name}`);
+                      setShowDropdown(false);
+                    }}
+                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                  >
+                    {p.name} <span className="text-gray-500">({p.owner.name})</span>
+                  </li>
+                ))}
+              {patients.filter(
+                (p) =>
+                  p.name.toLowerCase().includes(searchPatient.toLowerCase()) ||
+                  p.owner.name.toLowerCase().includes(searchPatient.toLowerCase())
+              ).length === 0 && (
+                <li className="px-4 py-2 text-gray-400">No matches found</li>
+              )}
+            </ul>
+          )}
+        </div>
 
-        {/* Veterinarian Dropdown */}
+        {/* Vet Dropdown */}
         <label className="block text-sm font-medium text-gray-700">Select Veterinarian</label>
         <select
           name="vet"
@@ -104,7 +150,7 @@ const AppointmentForm = () => {
           ))}
         </select>
 
-        {/* Appointment Date */}
+        {/* Date */}
         <label className="block text-sm font-medium text-gray-700">Date</label>
         <input
           type="date"
