@@ -1,22 +1,51 @@
-import express from 'express'
-import mongoose from 'mongoose'
-import patientRoute from './routes/patients/patient.js';
-import ownerRoute from './routes/owners/owners.js';
-import inventoriesRoute from './routes/inventories/inventories.js';
-import employeeRoute from './routes/employee/employee.js'
+import dotenv from "dotenv";
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+import ownerRoutes from "./routes/ownerRoutes.js";
+import patientRoutes from "./routes/patientRoutes.js"
+import testRoutes from './routes/testRoutes.js';
+import examRoutes from "./routes/examRoutes.js";
+import staffRoutes from "./routes/staffRoutes.js";
+import appointmentRoutes from "./routes/appointmentRoutes.js";
+import inventoryRoutes from "./routes/inventoryRoutes.js";
+import invoiceRoutes from "./routes/invoiceRoutes.js";
+import shopRoutes from "./routes/shopRoutes.js";
+import authRoutes from './routes/authRoutes.js';
+
+dotenv.config();
 const app = express();
 app.use(express.json());
-app.use('/owner',ownerRoute);
-app.use('/patient', patientRoute)
-app.use('/inventories', inventoriesRoute)
-app.use('/employee',employeeRoute)
+app.use(cors());
+
+const PORT = process.env.PORT || 5000;
+
+// Connect to MongoDB
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("MongoDB Connected"))
+  .catch((err) => console.log("MongoDB Connection Error:", err));
+
+// Default Route
+app.use('/api/auth', authRoutes);
+// ------------------ Owner Routes ------------------
+app.use("/owners", ownerRoutes);
+// ------------------ Patient Routes ------------------
+app.use("/patients", patientRoutes);
+// ------------------ Test Routes ------------------
+app.use("/tests", testRoutes);
+// ------------------ Exam Routes ------------------
+app.use("/exams", examRoutes);
+// ------------------ Staff Routes ------------------
+app.use("/staff", staffRoutes);
+// ------------------ Appointment Routes ------------------
+app.use("/appointments", appointmentRoutes);
+// ------------------ Appointment Routes ------------------
+app.use("/inventory", inventoryRoutes);
+app.use("/invoices", invoiceRoutes);
+app.use("/shop", shopRoutes);
 
 
-mongoose.connect('mongodb+srv://jerbyyi:xdpp8irbU5OABbXV@cluster0.rk5vp.mongodb.net/RL?retryWrites=true&w=majority&appName=Cluster0').then(()=>{
-    app.listen(5000, ()=>{
-        console.log('http://localhost:5000')
-    })
-}).catch((err)=>{
-    console.log(err.message);
-})
 
+
+// Start Server
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
