@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Logo from '../src/assets/logo.png'; // Adjust the path to your logo
 
+
+
 function Login() {
     const [email, setEmail] = useState(''); // Changed state variable to 'email'
     const [password, setPassword] = useState('');
@@ -44,16 +46,17 @@ function Login() {
 
     return (
         <div>
-            <section className="bg-gray-50 min-h-screen flex items-center justify-center">
-                <div className="bg-gray-100 flex rounded-2xl shadow-lg max-w-3xl p-5">
+            <section className="login-section min-h-screen flex items-center justify-center">
+                <div className="bg-gray-100 flex rounded-2xl shadow-lg max-w-3xl p-10">
                     <div className="md:w-1/2 px-8">
-                        <h2 className="font-bold text-2xl text-[#002D74]">Login</h2>
+                        <h1 className="font-bold text-5xl text-[#002D74]">Login</h1>
                         <p className="text-sm mt-4 text-[#537dc2]">
                             Welcome Back, have a nice day.
                         </p>
+                        <br />
 
                         <form className="flex flex-col gap-4" onSubmit={handleLogin}>
-                            <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">
+                            <label htmlFor="email" className="block text-gray-700 text-sm font-bold">
                                 Email:
                             </label>
                             <input
@@ -66,6 +69,9 @@ function Login() {
                                 onChange={(e) => setEmail(e.target.value)} // Updated onChange handler
                                 required
                             />
+                            <label htmlFor="password" className="block text-gray-700 text-sm font-bold">
+                                Password:
+                            </label>
                             <div className="relative">
                                 <input
                                     className="p-2 rounded-xl border w-full"

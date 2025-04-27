@@ -93,7 +93,7 @@ const StaffTable = () => {
 
       {/* Responsive Table */}
             {activeTab == "table" ? ( <table className="w-full border-collapse border border-gray-200 rounded-lg overflow-hidden shadow-md">
-        <thead className="bg-blue-500 text-white">
+        <thead className="bg-sky-100">
           <tr>
             <th className="p-4 text-left">Name</th>
             <th className="p-4 text-left">Role</th>
@@ -139,7 +139,7 @@ const StaffTable = () => {
           ))}
         </tbody>
       </table>) : (    <table className="w-full border-collapse border border-gray-200 rounded-lg overflow-hidden shadow-md">
-        <thead className="bg-green-600 text-white">
+        <thead className="bg-sky-100">
           <tr>
             <th className="p-4 text-left">Name</th>
             <th className="p-4 text-left">Role</th>

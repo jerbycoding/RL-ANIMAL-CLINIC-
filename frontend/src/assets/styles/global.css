@@ -1,0 +1,18 @@
+.login-section {
+    background: linear-gradient(135deg, #8bbfcc, #c2c5cd, #8bbfcc, #c2c5cd);
+    background-size: 400% 400%;
+    animation: vetGradientMove 12s ease infinite;
+    min-height: 100vh;
+    }
+
+    @keyframes vetGradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.Sidebar {
+    background-color: #f4f6fb;
+}
+
+

@@ -36,15 +36,15 @@ export default function Topbar() {
   }, [dropdownRef]);
 
   return (
-    <div className="flex justify-between items-center p-4 bg-white dark:bg-gray-800 shadow-md">
+    <div className="flex justify-between items-center p-4 bg-sky-400 dark:bg-gray-800 shadow-md">
       <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100">
         RL ANIMAL CLINIC <ToggleButton />
       </h1>
       <div className="flex items-center gap-4">
-        <FaBell className="text-gray-600 dark:text-gray-300 text-xl cursor-pointer" />
+        <FaBell className="text-black-600 dark:text-gray-300 text-xl cursor-pointer" />
         <div className="relative">
           <FaUserCircle
-            className="text-gray-600 dark:text-gray-300 text-xl cursor-pointer"
+            className="text-black-600 dark:text-gray-300 text-xl cursor-pointer"
             onClick={toggleDropdown}
             aria-expanded={isDropdownOpen}
             aria-haspopup="true"

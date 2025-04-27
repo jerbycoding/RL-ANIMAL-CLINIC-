@@ -99,7 +99,7 @@ const InventoryTable = () => {
       <div className="mt-5">
   <div className="relative shadow-md sm:rounded-lg min-h-[750px] overflow-y-scroll">
     <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 border border-gray-200">
-      <thead className="text-xs text-gray-700 uppercase bg-blue-50 dark:bg-gray-700 dark:text-gray-400 sticky top-0">
+      <thead className="font-bold-700 text-xs text-gray-700 uppercase bg-sky-100 dark:bg-gray-700 dark:text-gray-400 sticky top-0">
         <tr>
           <th className="px-6 py-3 text-center">Item Name</th>
           <th className="px-6 py-3 text-center">Category</th>

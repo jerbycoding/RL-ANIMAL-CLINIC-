@@ -43,7 +43,7 @@ const InvoiceDashboard = () => {
       {/* Invoice Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-200 shadow-sm">
-          <thead className="bg-blue-600 text-white">
+          <thead className="bg-sky-100">
             <tr>
               <th className="px-4 py-3 text-left">Invoice #</th>
               <th className="px-4 py-3 text-left">Owner Name</th>
