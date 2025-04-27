@@ -6,7 +6,7 @@ export default function Sidebar() {
     <div className="w-64 bg-white dark:bg-gray-800 p-4 shadow-lg">
       <h2 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">RL Clinic</h2>
       <ul className="space-y-2">
-        <NavLink to="/dashboard" className="flex items-center gap-2 p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
+        <NavLink to="/dashboard/clinic" className="flex items-center gap-2 p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">
           <FaTachometerAlt /> Dashboard
         </NavLink>
         <NavLink to="/dashboard/PatientManagement" className="flex items-center gap-2 p-2 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-md">

@@ -14,7 +14,7 @@ import InventoryTable from './pages/InventoryTable';
 import BillingAndInvoice from './pages/BillingAndInvoice';
 import EditPatientForm from './pages/Components/EditPatientForm';
 import ProtectedRoute from './pages/Components/ProtectedRoute';
-
+import Clinic from './pages/Clinic';
 const isAuthenticated = () => localStorage.getItem('token') !== null;
 
 const App = () => (
@@ -30,34 +30,39 @@ const App = () => (
           </ProtectedRoute>
         }
       >
-        <Route index element={<Navigate to="PatientManagement" replace />} />
+     <Route
+          path="clinic"
+          element={<ProtectedRoute allowedRoles={['veterinary', 'admin']}>
+          <Clinic></Clinic>
+          </ProtectedRoute>}
+        />
 
         {/* Veterinary Access */}
         <Route
           path="PatientManagement"
-          element={<ProtectedRoute allowedRoles={['veterinary']}>
+          element={<ProtectedRoute allowedRoles={['veterinary', 'admin']}>
             <PatientManagement />
           </ProtectedRoute>}
         />
-        <Route path="PatientForm" element={<ProtectedRoute allowedRoles={['veterinary']}>
+        <Route path="PatientForm" element={<ProtectedRoute allowedRoles={['veterinary', 'admin']}>
           <PatientForm />
         </ProtectedRoute>} />
-        <Route path="EditPatientForm/:id" element={<ProtectedRoute allowedRoles={['veterinary']}>
+        <Route path="EditPatientForm/:id" element={<ProtectedRoute allowedRoles={['veterinary', 'admin']}>
           <EditPatientForm />
         </ProtectedRoute>} />
-        <Route path="PatientOverview/:id" element={<ProtectedRoute allowedRoles={['veterinary']}>
+        <Route path="PatientOverview/:id" element={<ProtectedRoute allowedRoles={['veterinary', 'admin']}>
           <PatientOverview />
         </ProtectedRoute>} />
-        <Route path="CheckUp" element={<ProtectedRoute allowedRoles={['veterinary', 'staff']}> {/* Assuming staff can also do check-ups */}
+        <Route path="CheckUp" element={<ProtectedRoute allowedRoles={['veterinary', 'staff', 'admin']}> {/* Assuming staff can also do check-ups */}
           <PhysicalExamForm />
         </ProtectedRoute>} />
-        <Route path="Appointments" element={<ProtectedRoute allowedRoles={['veterinary', 'staff']}> {/* Assuming staff can manage appointments */}
+        <Route path="Appointments" element={<ProtectedRoute allowedRoles={['veterinary', 'staff', 'admin']}> {/* Assuming staff can manage appointments */}
           <AppointmentsTable />
         </ProtectedRoute>} />
-        <Route path="AppointmentForm" element={<ProtectedRoute allowedRoles={['veterinary', 'staff']}>
+        <Route path="AppointmentForm" element={<ProtectedRoute allowedRoles={['veterinary', 'staff', 'admin']}>
           <AppointmentForm />
         </ProtectedRoute>} />
-        <Route path="Billing" element={<ProtectedRoute allowedRoles={['staff', 'admin']}> {/* Assuming staff and admin handle billing */}
+        <Route path="Billing" element={<ProtectedRoute allowedRoles={['staff', 'admin', 'admin']}> {/* Assuming staff and admin handle billing */}
           <BillingAndInvoice />
         </ProtectedRoute>} />
 

@@ -26,6 +26,10 @@ mongoose.connect(process.env.MONGO_URI)
   .catch((err) => console.log("MongoDB Connection Error:", err));
 
 // Default Route
+app.get('/', (req,res)=>{
+  res.send("hello world durias");
+  res.end() ;
+})
 app.use('/api/auth', authRoutes);
 // ------------------ Owner Routes ------------------
 app.use("/owners", ownerRoutes);
