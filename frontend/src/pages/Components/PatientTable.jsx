@@ -88,7 +88,7 @@ function PatientTable() {
       <div className="mt-6">
   <div className="relative shadow-xl sm:rounded-2xl overflow-auto max-h-[650px] border border-gray-200 dark:border-gray-700">
     <table className="w-full text-sm text-gray-700 dark:text-gray-300">
-      <thead className="text-xs uppercase bg-gray-100 dark:bg-gray-800 dark:text-gray-400 sticky top-0 z-10">
+      <thead className="font-bold text-xs uppercase bg-sky-100 dark:bg-gray-800 dark:text-gray-400 sticky top-0 z-10">
         <tr>
           <th className="px-6 py-4 text-center">Patient Name</th>
           <th className="px-6 py-4 text-center">Breed</th>

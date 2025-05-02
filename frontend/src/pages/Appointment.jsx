@@ -72,7 +72,7 @@ const AppointmentsTable = () => {
       enqueueSnackbar("Appointment status updated successfully!", {
         variant: "success",
       });
-      navigate("/Appointments");
+      navigate("/dashboard/Appointments");
     } catch (error) {
       console.error("Error updating status:", error);
       alert("Failed to update appointment status.");
@@ -167,9 +167,9 @@ const AppointmentsTable = () => {
 
             <button
               onClick={() => {
-                navigate("/AppointmentForm");
+                navigate("/dashboard/AppointmentForm");
               }}
-              className="text-white p-3 bg-blue-500 rounded-md"
+              className="text-white p-3 bg-green-500 rounded-md font-bold"
             >
               Add
             </button>
@@ -181,7 +181,7 @@ const AppointmentsTable = () => {
       <div className="mt-5">
   <div className="relative shadow-md sm:rounded-lg h-[650px] overflow-auto">
     <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-      <thead className="text-xs text-gray-700 uppercase bg-green-100 dark:bg-gray-700 dark:text-gray-400 sticky top-0">
+      <thead className="font-bold-700 text-xs text-gray-700 uppercase bg-sky-100 dark:bg-gray-700 dark:text-gray-400 sticky top-0">
         <tr>
           <th className="px-6 py-3 text-center">Patient</th>
           <th className="px-6 py-3 text-center">Veterinarian</th>

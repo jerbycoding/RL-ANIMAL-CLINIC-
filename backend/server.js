@@ -12,7 +12,7 @@ import inventoryRoutes from "./routes/inventoryRoutes.js";
 import invoiceRoutes from "./routes/invoiceRoutes.js";
 import shopRoutes from "./routes/shopRoutes.js";
 import authRoutes from './routes/authRoutes.js';
-
+import serviceRoutes from './routes/serviceRoutes.js';
 dotenv.config();
 const app = express();
 app.use(express.json());
@@ -20,7 +20,7 @@ app.use(cors());
 
 const PORT = process.env.PORT || 5000;
 
-// Connect to MongoDB
+
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.log("MongoDB Connection Error:", err));
@@ -47,6 +47,7 @@ app.use("/appointments", appointmentRoutes);
 app.use("/inventory", inventoryRoutes);
 app.use("/invoices", invoiceRoutes);
 app.use("/shop", shopRoutes);
+app.use("/services", serviceRoutes)
 
 
 

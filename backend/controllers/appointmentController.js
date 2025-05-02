@@ -11,7 +11,62 @@ export const createAppointment = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+export const getTodayAppointmentsCount = async (req, res) => {
+  try {
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
 
+    const count = await Appointment.countDocuments({
+      date: { $gte: todayStart, $lte: todayEnd },
+    });
+    res.json({ count });
+  } catch (error) {
+    console.error("Error fetching today's appointments count:", error);
+    res.status(500).json({ message: 'Error fetching count' });
+  }
+};
+export const getTodayAppointmentsDetails = async (req, res) => {
+  try {
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
+    const appointments = await Appointment.find({
+      date: {
+        $gte: todayStart,
+        $lte: todayEnd,
+      },
+    })
+      .populate({
+        path: 'patient',
+        populate: {
+          path: 'owner',
+          select: 'name', // Assuming your Owner model has a 'name' field
+        },
+        select: 'name owner',
+      })
+      .populate('vet', 'name');
+
+    const formattedAppointments = appointments.map(appt => ({
+      _id: appt._id,
+      startTime: appt.startTime,
+      endTime: appt.endTime,
+      purpose: appt.purpose,
+      patientName: appt.patient.name,
+      ownerName: appt.patient.owner ? appt.patient.owner.name : 'N/A', // Access owner's name through nested populate
+      vetName: appt.vet ? appt.vet.name : 'N/A',
+      status: appt.status,
+    }));
+
+    res.json(formattedAppointments);
+  } catch (error) {
+    console.error('Error fetching today\'s appointments:', error);
+    res.status(500).json({ message: 'Error fetching appointments' });
+  }
+};
 // Get All Appointments
 export const getAllAppointments = async (req, res) => {
   try {

@@ -1,355 +1,193 @@
-import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
-
-const InvoiceForm = ({ onClose, onAdd, isOpen }) => {
-  const [formData, setFormData] = useState({
-    invoiceNumber: `INV-${Date.now()}`,
-    dateIssued: new Date().toISOString().split("T")[0],
-    petOwner: "",
-    patient: "",
-    services: [{ description: "", cost: 0 }],
-    totalAmount: 0,
-  });
-
+import React, { useState, useEffect } from 'react';
+import { useSnackbar } from "notistack";
+const InvoiceForm = ({ isOpen, onClose, onAdd }) => {
+  const [invoiceNumber, setInvoiceNumber] = useState('');
+  const [patientNameInput, setPatientNameInput] = useState('');
+  const [patientId, setPatientId] = useState('');
+  const [totalAmount, setTotalAmount] = useState('');
   const [patients, setPatients] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
   const [filteredPatients, setFilteredPatients] = useState([]);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [error, setError] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const printRef = useRef(null);
+  const [availableServices, setAvailableServices] = useState([]);
+  const [selectedServiceIds, setSelectedServiceIds] = useState([]);
+  const [showPatientDropdown, setShowPatientDropdown] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
-    axios
-      .get("http://localhost:5000/patients")
-      .then((res) => {
-        setPatients(Array.isArray(res.data) ? res.data : []);
-      })
-      .catch((err) => {
-        console.error("Failed to fetch patients:", err);
-        setError("Failed to fetch patients.");
-      });
+    // Fetch patients and services
+    fetch('http://localhost:5000/patients')
+      .then(response => response.json())
+      .then(data => setPatients(data))
+      .catch(error => console.error('Error fetching patients:', error));
+
+    fetch('http://localhost:5000/services')
+      .then(response => response.json())
+      .then(data => setAvailableServices(data))
+      .catch(error => console.error('Error fetching services:', error));
+
+    // Generate initial invoice number
+    generateInvoiceNumber();
   }, []);
 
+  const generateInvoiceNumber = () => {
+    const prefix = 'INV-';
+    const timestamp = Date.now().toString().slice(-6); // Last 6 digits of timestamp
+    const randomNumber = Math.floor(Math.random() * 1000).toString().padStart(3, '0'); // 3 random digits
+    setInvoiceNumber(prefix + timestamp + randomNumber);
+  };
+
+  const handlePatientInputChange = (event) => {
+    const inputText = event.target.value;
+    setPatientNameInput(inputText);
+    setShowPatientDropdown(true);
+    const filtered = patients.filter(patient =>
+      patient.name.toLowerCase().includes(inputText.toLowerCase())
+    );
+    setFilteredPatients(filtered);
+    // Reset patientId if the input changes and doesn't match a selected patient
+    if (!filtered.some(p => p.name.toLowerCase() === inputText.toLowerCase())) {
+      setPatientId('');
+    }
+  };
+
+  const selectPatient = (patient) => {
+    setPatientNameInput(patient.name);
+    setPatientId(patient._id);
+    setShowPatientDropdown(false);
+  };
+
+  const handleServiceChange = (event) => {
+    const serviceId = event.target.value;
+    const isChecked = event.target.checked;
+
+    if (isChecked) {
+      setSelectedServiceIds([...selectedServiceIds, serviceId]);
+    } else {
+      setSelectedServiceIds(selectedServiceIds.filter(id => id !== serviceId));
+    }
+  };
+
   useEffect(() => {
-    if (searchQuery.trim() === "") {
-      setFilteredPatients([]);
+    // Calculate total amount whenever selected services change
+    let total = 0;
+    selectedServiceIds.forEach(serviceId => {
+      const service = availableServices.find(s => s._id === serviceId);
+      if (service && service.charge) {
+        total += service.charge;
+      }
+    });
+    setTotalAmount(total.toFixed(2));
+  }, [selectedServiceIds, availableServices]);
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    if (!patientId) {
+      alert('Please select a patient.');
       return;
     }
 
-    const results = patients.filter((patient) =>
-      `${patient.name} ${patient.owner?.name || ""}`
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase())
-    );
-    setFilteredPatients(results);
-  }, [searchQuery, patients]);
+    const newInvoice = {
+      invoiceNumber,
+      patientId,
+      services: selectedServiceIds,
+      totalAmount: parseFloat(totalAmount),
+    };
 
-  const handleSelectPatient = (patient) => {
-    setSearchQuery(patient.name);
-    setFormData((prev) => ({
-      ...prev,
-      patient: patient._id,
-      petOwner: patient.owner?._id || "",
-    }));
-    setShowDropdown(false);
+    onAdd(newInvoice);
+    onClose(); // Close the modal after adding
+    resetForm();
+    generateInvoiceNumber(); // Generate a new number for the next invoice
+    enqueueSnackbar("Invoice submitted successfully!", { variant: "success" });
+
   };
 
-  const handleServiceChange = (index, field, value) => {
-    const updatedServices = [...formData.services];
-    updatedServices[index][field] = field === "cost" ? Number(value) : value;
-
-    const total = updatedServices.reduce((sum, item) => sum + item.cost, 0);
-
-    setFormData((prev) => ({
-      ...prev,
-      services: updatedServices,
-      totalAmount: total,
-    }));
+  const resetForm = () => {
+    setPatientNameInput('');
+    setPatientId('');
+    setSelectedServiceIds([]);
+    setTotalAmount('');
+    setShowPatientDropdown(false);
   };
 
-  const addService = () => {
-    setFormData((prev) => ({
-      ...prev,
-      services: [...prev.services, { description: "", cost: 0 }],
-    }));
-  };
-
-  const removeService = (index) => {
-    const updated = [...formData.services];
-    updated.splice(index, 1);
-    const total = updated.reduce((sum, s) => sum + s.cost, 0);
-
-    setFormData((prev) => ({
-      ...prev,
-      services: updated,
-      totalAmount: total,
-    }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (submitting) return;
-    setSubmitting(true);
-    try {
-      const response = await axios.post(
-        "http://localhost:5000/invoices",
-        formData
-      );
-      onAdd(response.data);
-      onClose();
-      handlePrint();
-    } catch (err) {
-      console.error("Error creating invoice:", err);
-      setError("Failed to create invoice. Please check your input.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handlePrint = () => {
-    const printContent = printRef.current;
-
-    if (!printContent) return;
-
-    const printWindow = window.open("", "", "width=900,height=650");
-
-    if (!printWindow) return;
-
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>Invoice Receipt</title>
-          <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.17/dist/tailwind.min.css" rel="stylesheet">
-          <style>
-            body { font-family: Arial, sans-serif; padding: 20px; }
-          </style>
-        </head>
-        <body>
-          <h1 class="text-xl font-bold">Invoice Receipt</h1>
-          ${printContent.innerHTML}
-        </body>
-      </html>
-    `);
-
-    printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
-    printWindow.close();
-  };
-
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
-      <div className="bg-white p-6 rounded-xl shadow-lg max-w-lg w-full relative">
-        <h2 className="text-xl font-bold mb-4">New Invoice</h2>
-
-        {error && <div className="text-red-600 mb-3">{error}</div>}
-
-        <form onSubmit={handleSubmit}>
-          <div className="mb-3">
-            <label className="block">Invoice Number</label>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+      <div className="bg-white p-6 rounded-md shadow-lg w-full max-w-md">
+        <h2 className="text-lg font-bold mb-4">Add New Invoice</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="invoiceNumber" className="block text-sm font-medium text-gray-700">Invoice Number:</label>
             <input
               type="text"
+              id="invoiceNumber"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              value={invoiceNumber}
               readOnly
-              value={formData.invoiceNumber}
-              className="w-full p-2 border rounded"
             />
           </div>
-
-          <div className="mb-3">
-            <label className="block">Date Issued</label>
-            <input
-              type="date"
-              value={formData.dateIssued}
-              onChange={(e) =>
-                setFormData({ ...formData, dateIssued: e.target.value })
-              }
-              className="w-full p-2 border rounded"
-            />
-          </div>
-
-          <div className="mb-3 relative">
-            <label className="block">Patient</label>
+          <div className='relative'>
+            <label htmlFor="patientName" className="block text-sm font-medium text-gray-700">Patient:</label>
             <input
               type="text"
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setShowDropdown(true);
-              }}
-              onFocus={() => setShowDropdown(true)}
-              className="w-full p-2 border rounded"
-              placeholder="Search patient or owner name"
-              required
+              id="patientName"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              value={patientNameInput}
+              onChange={handlePatientInputChange}
+              onFocus={() => setShowPatientDropdown(true)}
             />
-            {showDropdown && filteredPatients.length > 0 && (
-              <ul className="absolute z-10 w-full bg-white border mt-1 rounded max-h-40 overflow-auto shadow">
-                {filteredPatients.map((patient) => (
+            {showPatientDropdown && filteredPatients.length > 0 && (
+              <ul className="absolute z-10 bg-white border border-gray-300 rounded-md shadow-lg mt-1 w-full max-h-48 overflow-y-auto">
+                {filteredPatients.map(patient => (
                   <li
                     key={patient._id}
-                    className="p-2 hover:bg-gray-100 cursor-pointer"
-                    onClick={() => handleSelectPatient(patient)}
+                    className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    onClick={() => selectPatient(patient)}
                   >
-                    {patient.name} ({patient.owner?.name})
+                    {patient.name} - {patient.owner.name}
                   </li>
                 ))}
               </ul>
             )}
+            {showPatientDropdown && filteredPatients.length === 0 && patientNameInput && (
+              <p className="mt-1 text-sm text-gray-500">No patients found.</p>
+            )}
           </div>
-
-          <div className="mb-4">
-            <label className="block font-semibold mb-2">Services</label>
-            {formData.services.map((service, idx) => (
-              <div key={idx} className="flex gap-2 mb-2">
-                <input
-                  type="text"
-                  placeholder="Description"
-                  value={service.description}
-                  onChange={(e) =>
-                    handleServiceChange(idx, "description", e.target.value)
-                  }
-                  className="flex-1 p-2 border rounded"
-                  required
-                />
-                <input
-                  type="number"
-                  placeholder="Cost"
-                  value={service.cost}
-                  onChange={(e) =>
-                    handleServiceChange(idx, "cost", e.target.value)
-                  }
-                  className="w-24 p-2 border rounded"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => removeService(idx)}
-                  className="text-red-600 font-bold"
-                >
-                  ✕
-                </button>
-              </div>
-            ))}
-            <button
-              type="button"
-              onClick={addService}
-              className="text-blue-600 mt-1"
-            >
-              + Add Service
-            </button>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Services:</label>
+            <div className="mt-1 space-y-2">
+              {availableServices.map(service => (
+                <div key={service._id} className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id={`service-${service._id}`}
+                    value={service._id}
+                    className="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 h-4 w-4"
+                    checked={selectedServiceIds.includes(service._id)}
+                    onChange={handleServiceChange}
+                  />
+                  <label htmlFor={`service-${service._id}`} className="ml-2 text-sm text-gray-700">{service.name} (₱{service.charge.toFixed(2)})</label>
+                </div>
+              ))}
+            </div>
           </div>
-
-          <div className="mb-3">
-            <label className="block">Total Amount</label>
+          <div>
+            <label htmlFor="totalAmount" className="block text-sm font-medium text-gray-700">Total Amount:</label>
             <input
-              type="number"
-              value={formData.totalAmount}
+              type="text"
+              id="totalAmount"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              value={`₱${totalAmount}`}
               readOnly
-              className="w-full p-2 border rounded bg-gray-100"
             />
           </div>
-
-  
-          <div className="flex justify-end gap-3 mt-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={submitting}
-              className={`px-4 py-2 rounded text-white ${
-                submitting ? "bg-gray-400" : "bg-green-600 hover:bg-green-700"
-              }`}
-            >
-              {submitting ? "Submitting..." : "Submit Invoice"}
-            </button>
+          <div className="flex justify-end space-x-2">
+            <button type="button" onClick={onClose} className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md">Cancel</button>
+            <button type="submit" className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md">Add Invoice</button>
           </div>
         </form>
-
-        <div ref={printRef} style={{ display: "none" }}>
-          <div className="max-w-2xl mx-auto p-6 text-sm text-gray-800 font-sans">
-            <div className="text-center mb-6">
-              <h1 className="text-3xl font-bold text-green-700">
-                Pawfect Animal Clinic
-              </h1>
-              <p className="text-sm">123 Pet Street, Animalia City, VET 101</p>
-              <p className="text-sm">
-                Phone: (123) 456-7890 | Email: info@pawfectclinic.com
-              </p>
-            </div>
-
-            <div className="mb-4 border-b pb-2">
-              <div className="flex justify-between">
-                <p>
-                  <strong>Invoice #:</strong> {formData.invoiceNumber}
-                </p>
-                <p>
-                  <strong>Date:</strong> {formData.dateIssued}
-                </p>
-              </div>
-              <div className="mt-2">
-                <p>
-                  <strong>Patient:</strong> {searchQuery}
-                </p>
-                <p>
-                  <strong>Pet Owner ID:</strong> {formData.petOwner}
-                </p>
-              </div>
-            </div>
-
-            <table className="w-full border border-gray-300 mb-4">
-              <thead className="bg-gray-100 text-left">
-                <tr>
-                  <th>Hello World</th>
-                  <th className="border px-3 py-2">Description</th>
-                  <th className="border px-3 py-2">Cost</th>
-                </tr>
-              </thead>
-              <tbody>
-                {formData.services.map((s, i) => (
-                  <tr key={i} className="border-t">
-                    <td className="border px-3 py-1">{s.description}</td>
-                    <td className="border px-3 py-1">${s.cost.toFixed(2)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            <div className="text-right mb-4">
-              <p className="text-lg font-semibold">
-                Total:{" "}
-                <span className="text-green-700">
-                  ${formData.totalAmount.toFixed(2)}
-                </span>
-              </p>
-            </div>
-
-            {formData.notes && (
-              <div className="mb-4">
-                <p>
-                  <strong>Notes:</strong>
-                </p>
-                <p className="italic text-gray-600">{formData.notes}</p>
-              </div>
-            )}
-
-            <div className="text-center mt-8 border-t pt-4">
-              <p className="font-semibold text-gray-700">
-                Thank you for trusting Pawfect Animal Clinic 🐾
-              </p>
-              <p className="text-xs text-gray-500">
-                This receipt is system generated and does not require a
-                signature.
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

@@ -2,17 +2,17 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Topbar from './Components/Topbar';
 import Sidebar from './Components/Sidebar';
-// You might have a Footer component as well
-// import Footer from '../components/Footer';
+
+
 
 function Dashboard() {
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900 "   >
       {/* Topbar */}
       <Topbar />
 
       {/* Main Content Area with Sidebar */}
-      <div className="flex flex-1">
+      <div className="flex flex-1  object-fit w-50 h-2" >
         {/* Sidebar */}
         <Sidebar />
 

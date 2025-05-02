@@ -1,151 +1,113 @@
-import {Invoice} from "../models/models.js";
-import {Owner} from "../models/models.js";
-import {Patient} from "../models/models.js";
+import mongoose from 'mongoose'
+import { Invoice, Patient } from '../models/models.js';
 
-// Get all invoices
+
+export const createInvoice = async (req, res) => {
+  try {
+    const { invoiceNumber, dateIssued, patientId, services, totalAmount } = req.body;
+
+    // Validate invoiceNumber
+    if (!invoiceNumber || typeof invoiceNumber !== 'string' || invoiceNumber.trim() === '') {
+      return res.status(400).json({ message: 'Invoice number is required' });
+    }
+
+    // Validate patientId
+    if (!patientId || !mongoose.Types.ObjectId.isValid(patientId)) {
+      return res.status(400).json({ message: 'Invalid patientId provided' });
+    }
+
+    // Check if the patient exists (optional, but recommended for data integrity)
+    const patient = await Patient.findById(patientId);
+    if (!patient) {
+      return res.status(404).json({ message: 'Patient not found' });
+    }
+
+    // Validate services
+    if (!services || !Array.isArray(services) || services.length === 0) {
+      return res.status(400).json({ message: 'At least one service ID is required' });
+    }
+
+    const areServiceIdsValid = services.every(serviceId => mongoose.Types.ObjectId.isValid(serviceId));
+    if (!areServiceIdsValid) {
+      return res.status(400).json({ message: 'One or more invalid service IDs' });
+    }
+
+    // Validate totalAmount
+    if (typeof totalAmount !== 'number' || isNaN(totalAmount)) {
+      return res.status(400).json({ message: 'Total amount must be a number' });
+    }
+    if (totalAmount < 0) {
+      return res.status(400).json({ message: 'Total amount cannot be negative' });
+    }
+
+    // Create the invoice document directly from the request body
+    const newInvoice = new Invoice({
+      invoiceNumber,
+      dateIssued: dateIssued || Date.now(), // Use provided or default to now
+      patient: patientId,
+      services: services.map(serviceId => ({ service: serviceId })),
+      totalAmount,
+    });
+    const savedInvoice = await newInvoice.save();
+
+
+    const populatedInvoice = await Invoice.findById(savedInvoice._id)
+    .populate({
+      path: 'patient',
+      populate: {
+        path: 'owner' // assuming this is a ref to the Owner model
+      }
+    })
+    .populate('services.service');
+    res.status(201).json(populatedInvoice);
+  } catch (error) {
+    console.error('Error creating invoice:', error);
+    res.status(500).json({ message: 'Failed to create invoice', error: error.message });
+  }
+};
+
+export const getWeeklyRevenue = async (req, res) => {
+  try {
+    const today = new Date();
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay() + 1); // Monday
+    startOfWeek.setHours(0, 0, 0, 0);
+
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6); // Sunday
+    endOfWeek.setHours(23, 59, 59, 999);
+
+    const invoices = await Invoice.find({
+      dateIssued: { $gte: startOfWeek, $lte: endOfWeek },
+    });
+
+    const totalRevenue = invoices.reduce((sum, invoice) => sum + invoice.totalAmount, 0);
+
+    res.json({
+      weekStart: startOfWeek,
+      weekEnd: endOfWeek,
+      totalRevenue,
+      invoiceCount: invoices.length,
+    });
+  } catch (error) {
+    console.error("Revenue fetch error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 export const getAllInvoices = async (req, res) => {
   try {
     const invoices = await Invoice.find()
-      .populate({
-        path: "patient",
-        populate: {
-          path: "owner",
-          select: "name contactNumber"
-        }
-      });
-
+    .populate({
+      path: 'patient',
+      populate: {
+        path: 'owner' // same nested population
+      }
+    })
+    .populate('services.service');
     res.status(200).json(invoices);
-  } catch (err) {
-    console.error("Error fetching invoices:", err.message);
-    res.status(500).json({ error: "Failed to fetch invoices." });
-  }
-};
-
-// Get invoice by ID
-export const getInvoiceById = async (req, res) => {
-  try {
-    const invoice = await Invoice.findById(req.params.id)
-      .populate("petOwner")
-      .populate("patient");
-
-    if (!invoice) {
-      return res.status(404).json({ error: "Invoice not found." });
-    }
-    res.status(200).json(invoice);
-  } catch (err) {
-    res.status(500).json({ error: "Error fetching invoice." });
-  }
-};
-
-// Create new invoice
-export const createInvoice = async (req, res) => {
-  try {
-    const {
-      invoiceNumber,
-      dateIssued,
-      petOwner,
-      patient,
-      services,
-      totalAmount,
-      notes,
-    } = req.body;
-
-    const ownerExists = await Owner.findById(petOwner);
-    const patientExists = await Patient.findById(patient);
-
-    if (!ownerExists) {
-      return res.status(400).json({ error: "Invalid pet owner ID." });
-    }
-    if (!patientExists) {
-      return res.status(400).json({ error: "Invalid patient ID." });
-    }
-    if (String(patientExists.owner) !== String(petOwner)) {
-      return res.status(400).json({ error: "Patient does not belong to the specified owner." });
-    }
-
-    const newInvoice = new Invoice({
-      invoiceNumber,
-      dateIssued,
-      petOwner,
-      patient,
-      services,
-      totalAmount,
-      notes,
-    });
-
-    const savedInvoice = await newInvoice.save();
-    res.status(201).json(savedInvoice);
-  } catch (err) {
-    console.error("Invoice creation error:", err);
-    res.status(500).json({ error: "Failed to create invoice." });
-  }
-};
-
-// Update invoice
-export const updateInvoice = async (req, res) => {
-  try {
-    const {
-      invoiceNumber,
-      dateIssued,
-      petOwner,
-      patient,
-      services,
-      totalAmount,
-      notes,
-    } = req.body;
-
-    const invoice = await Invoice.findById(req.params.id);
-    if (!invoice) {
-      return res.status(404).json({ error: "Invoice not found." });
-    }
-
-    const ownerExists = await Owner.findById(petOwner);
-    const patientExists = await Patient.findById(patient);
-
-    if (!ownerExists || !patientExists) {
-      return res.status(400).json({ error: "Invalid owner or patient ID." });
-    }
-    if (String(patientExists.owner) !== String(petOwner)) {
-      return res.status(400).json({ error: "Patient does not belong to this owner." });
-    }
-
-    invoice.invoiceNumber = invoiceNumber;
-    invoice.dateIssued = dateIssued;
-    invoice.petOwner = petOwner;
-    invoice.patient = patient;
-    invoice.services = services;
-    invoice.totalAmount = totalAmount;
-    invoice.notes = notes;
-
-    const updatedInvoice = await invoice.save();
-    res.status(200).json(updatedInvoice);
-  } catch (err) {
-    console.error("Update error:", err);
-    res.status(500).json({ error: "Failed to update invoice." });
-  }
-};
-
-// Delete invoice
-export const deleteInvoice = async (req, res) => {
-  try {
-    const invoice = await Invoice.findByIdAndDelete(req.params.id);
-    if (!invoice) {
-      return res.status(404).json({ error: "Invoice not found." });
-    }
-    res.status(200).json({ message: "Invoice deleted successfully." });
-  } catch (err) {
-    res.status(500).json({ error: "Failed to delete invoice." });
-  }
-};
-export const deleteAllInvoice = async (req, res) => {
-  try {
-    const result = await Invoice.deleteMany({}); 
-    res.status(200).json({
-      message: "All shop invoices deleted successfully",
-      deletedCount: result.deletedCount,
-    });
   } catch (error) {
-    console.error("Error deleting all invoices:", error);
-    res.status(500).json({ message: "Server error while deleting all invoices" });
+    console.error('Error fetching invoices:', error);
+    res.status(500).json({ message: 'Failed to fetch invoices', error: error.message });
   }
 };

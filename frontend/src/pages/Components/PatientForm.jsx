@@ -3,8 +3,9 @@ import { useSnackbar } from "notistack";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { DotLoader } from "react-spinners";
+
 const PatientForm = () => {
-  const[loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const { enqueueSnackbar } = useSnackbar();
   const [owners, setOwners] = useState([]);
   const [newOwner, setNewOwner] = useState(false);
@@ -20,25 +21,40 @@ const PatientForm = () => {
     breed: "",
     species: "",
     color: "",
-    owner: "",
+    owner: "", // Will store the _id of the selected owner
   });
+  const [searchOwnerText, setSearchOwnerText] = useState("");
+  const [showOwnerDropdown, setShowOwnerDropdown] = useState(false);
   const navigate = useNavigate();
- 
+
   useEffect(() => {
     setLoading(true);
     fetch("http://localhost:5000/owners")
-      .then((res) => 
-        res.json()
-     )
-      .then((data) =>{
+      .then((res) => res.json())
+      .then((data) => {
         setOwners(data);
         setLoading(false);
-      }
-    )
+      })
       .catch((err) =>
         enqueueSnackbar("Error fetching owners", { variant: "error" })
       );
   }, []);
+
+  const handleOwnerSearchChange = (e) => {
+    setSearchOwnerText(e.target.value);
+    setShowOwnerDropdown(true); // Show dropdown as the user types
+    setPatientInput({ ...patientInput, owner: "" }); // Clear selected owner when searching
+  };
+
+  const selectExistingOwner = (ownerId) => {
+    setPatientInput({ ...patientInput, owner: ownerId });
+    setSearchOwnerText(owners.find((o) => o._id === ownerId)?.name || "");
+    setShowOwnerDropdown(false);
+  };
+
+  const filteredOwners = owners.filter((owner) =>
+    owner.name.toLowerCase().includes(searchOwnerText.toLowerCase())
+  );
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -73,8 +89,10 @@ const PatientForm = () => {
         });
         setOwnerInput({ name: "", address: "", contactNumber: "" });
         setNewOwner(false);
+        setSearchOwnerText("");
+        setShowOwnerDropdown(false);
         enqueueSnackbar("Patient added successfully", { variant: "success" });
-        navigate("/PatientManagement");
+        navigate("/dashboard/PatientManagement");
       } else {
         enqueueSnackbar("Failed to add patient", { variant: "error" });
       }
@@ -82,14 +100,16 @@ const PatientForm = () => {
       enqueueSnackbar("An error occurred", { variant: "error" });
     }
   };
-  if(loading){
+
+  if (loading) {
     return (
-      <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ' >
-          <DotLoader size={40}/>
-          <h1>Loading...</h1>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ">
+        <DotLoader size={40} />
+        <h1>Loading...</h1>
       </div>
-    )
+    );
   }
+
   return (
     <div className="p-6 max-w-3xl mx-auto bg-white dark:bg-gray-900 rounded-xl shadow-lg">
       <div className="flex justify-between items-center mb-6">
@@ -204,21 +224,40 @@ const PatientForm = () => {
         {/* Existing Owner Selection */}
         {!newOwner && (
           <div>
-            <select
-              className="border p-2 rounded-md w-full"
-              value={patientInput.owner}
-              onChange={(e) =>
-                setPatientInput({ ...patientInput, owner: e.target.value })
-              }
-              required
+            <label
+              htmlFor="ownerSearch"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
             >
-              <option value="">Select Owner</option>
-              {owners.map((owner) => (
-                <option key={owner._id} value={owner._id}>
-                  {owner.name}
-                </option>
-              ))}
-            </select>
+              Search Existing Owner
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                id="ownerSearch"
+                className="border p-2 rounded-md w-full"
+                placeholder="Enter owner name"
+                value={searchOwnerText}
+                onChange={handleOwnerSearchChange}
+              />
+              {showOwnerDropdown && filteredOwners.length > 0 && (
+                <ul className="absolute z-10 w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-md shadow-md mt-1 max-h-48 overflow-y-auto">
+                  {filteredOwners.map((owner) => (
+                    <li
+                      key={owner._id}
+                      className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                      onClick={() => selectExistingOwner(owner._id)}
+                    >
+                      {owner.name} ({owner.contactNumber})
+                    </li>
+                  ))}
+                  {searchOwnerText && filteredOwners.length === 0 && (
+                    <li className="px-4 py-2 text-gray-500 dark:text-gray-400">
+                      No matching owners
+                    </li>
+                  )}
+                </ul>
+              )}
+            </div>
           </div>
         )}
 

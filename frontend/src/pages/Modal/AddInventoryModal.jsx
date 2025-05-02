@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+import { useSnackbar } from "notistack";
 const AddInventoryModal = ({ isOpen, onClose, onAdd }) => {
   const [formData, setFormData] = useState({
     name: "",
@@ -10,7 +10,7 @@ const AddInventoryModal = ({ isOpen, onClose, onAdd }) => {
     expirationDate: "",
     notes: "",
   });
-
+  const { enqueueSnackbar } = useSnackbar();
   if (!isOpen) return null; // Hide modal when not open
 
   const handleChange = (e) => {
@@ -29,8 +29,11 @@ const AddInventoryModal = ({ isOpen, onClose, onAdd }) => {
       supplier: "",
       expirationDate: "",
       notes: "",
+      
     });
+
     onClose(); // Close modal after adding
+    enqueueSnackbar("Test submitted successfully!", { variant: "success" });
   };
 
   return (

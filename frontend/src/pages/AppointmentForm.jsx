@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-
+import { useNavigate } from "react-router-dom";
+import { useSnackbar } from "notistack";
 const AppointmentForm = () => {
   const [formData, setFormData] = useState({
     patient: "",
@@ -11,15 +12,15 @@ const AppointmentForm = () => {
     purpose: "",
     notes: ""
   });
-
+  
   const [patients, setPatients] = useState([]);
   const [vets, setVets] = useState([]);
   const [message, setMessage] = useState("");
-
+  const {enqueueSnackbar} = useSnackbar()
   const [searchPatient, setSearchPatient] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef();
-
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -65,9 +66,12 @@ const AppointmentForm = () => {
         notes: ""
       });
       setSearchPatient("");
+      navigate('/dashboard/Appointments');
+      enqueueSnackbar("Appointment Submitted !", { variant: "success" });
     } catch (error) {
       console.error("Error creating appointment:", error);
       setMessage("Failed to create appointment. Please try again.");
+      enqueueSnackbar("Error !", { variant: "error" });
     }
   };
 

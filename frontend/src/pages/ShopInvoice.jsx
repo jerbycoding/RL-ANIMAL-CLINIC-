@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
-
+import { useSnackbar } from "notistack";
 function ShopInvoice() {
   const [modalOpen, setModalOpen] = useState(false);
   const [invoiceData, setInvoiceData] = useState(null);
@@ -14,7 +14,7 @@ function ShopInvoice() {
   const [invoiceNumber, setInvoiceNumber] = useState("");
   const [shopInvoices, setShopInvoices] = useState([]);
   const printRef = useRef(null);
-
+  const { enqueueSnackbar } = useSnackbar();
   // State for delete confirmation modal (individual)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [invoiceToDeleteId, setInvoiceToDeleteId] = useState(null);
@@ -125,11 +125,12 @@ function ShopInvoice() {
 
     try {
       const res = await axios.post("http://localhost:5000/shop", invoiceDataToSend);
-      alert("Invoice submitted successfully!");
+ 
       setSelectedItems([]);
       setTotalAmount(0);
       handlePrint();
       setShopInvoices((prevInvoices) => [...prevInvoices, res.data]);
+      enqueueSnackbar("Test submitted successfully!", { variant: "success" });
     } catch (err) {
       console.error("Error submitting invoice:", err);
       alert("Failed to submit invoice");

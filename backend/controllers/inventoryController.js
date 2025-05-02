@@ -12,6 +12,19 @@ export const createInventoryItem = async (req, res) => {
   }
 };
 
+const LOW_STOCK_THRESHOLD = 5; 
+
+export const getLowStockItemsCount = async (req, res) => {
+  try {
+    const count = await Inventory.countDocuments({
+      quantity: { $lte: LOW_STOCK_THRESHOLD },
+    });
+    res.json({ count });
+  } catch (error) {
+    console.error('Error fetching low stock items count:', error);
+    res.status(500).json({ message: 'Error fetching count' });
+  }
+};
 // Get All Inventory Items
 export const getAllInventoryItems = async (req, res) => {
   try {

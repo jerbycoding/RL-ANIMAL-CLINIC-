@@ -205,7 +205,7 @@ const inventorySchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ["Medicine", "Food", "Vaccines", "Surgical Supplies", "Other"],
+    enum: ["Medicine", "Food"],
     required: true, // Define categories for items
   },
   quantity: {
@@ -270,49 +270,51 @@ const shopInvoiceSchema = new mongoose.Schema({
 
 
 
-
 const InvoiceSchema = new mongoose.Schema({
   invoiceNumber: { type: String, required: true, unique: true },
   dateIssued: { type: Date, default: Date.now, required: true },
-  patient: { type: mongoose.Schema.Types.ObjectId, ref: "Patient", required: true }, 
+  patient: { type: mongoose.Schema.Types.ObjectId, ref: "Patient", required: true },
   services: [
     {
-      description: { type: String, required: true },
-      cost: { type: Number, required: true },
-      quantity: { type: Number, default: 1 },
+      service: { type: mongoose.Schema.Types.ObjectId, ref: "Service", required: true },
     },
   ],
   totalAmount: { type: Number, required: true },
-});
 
-// Adding the `owner` info while populating `Patient`
-InvoiceSchema.pre("save", async function (next) {
-  try {
-    const patient = await this.model("Patient").populate("patient", "owner");  // Populating owner from patient
-    this.petOwner = patient.owner;  // Make sure this works as expected
-    next();
-  } catch (err) {
-    next(err);
-  }
 });
 
 
 
-const ServiceSchema = new mongoose.Schema({
-  description: {
+
+const serviceSchema = new mongoose.Schema({
+  name: {
     type: String,
-    required: true, // Briefly describe the service
-    trim: true,     // Removes leading/trailing spaces
+    required: true, // Name of the service (e.g., Consultation, Vaccination - Rabies, Spay)
+    trim: true,
+
   },
   category: {
     type: String,
-    enum: ["Medical", "Grooming", "Surgery", "Vaccination", "Other"], // Predefined categories
-    required: true,
+    enum: ["Consultation", "Vaccination", "Surgery", "Dental", "Laboratory", "Imaging", "Grooming"],
+    required: true, // Categorize services for easier management and reporting
   },
-  cost: {
+  description: {
+    type: String,
+    trim: true,
+    default: "", // Optional description of the service
+  },
+  charge: {
     type: Number,
-    required: true, 
-    min: 0,         
+    required: true, // The standard fee for this service
+    min: 0,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
   },
 });
 
@@ -330,7 +332,7 @@ const Shop = mongoose.model('ShopInvoice', shopInvoiceSchema);
 
 
 
-const Service= mongoose.model("Service", ServiceSchema);
+const Service= mongoose.model("Service", serviceSchema);
 
 
 const Owner = mongoose.model("Owner", ownerSchema);

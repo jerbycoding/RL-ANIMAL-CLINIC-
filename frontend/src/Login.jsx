@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Logo from '../src/assets/logo.png'; // Adjust the path to your logo
+import BG from '../src/assets/bg-design.png'
+
 
 function Login() {
     const [email, setEmail] = useState(''); // Changed state variable to 'email'
@@ -24,11 +26,25 @@ function Login() {
             if (response.status === 200) {
                 console.log('Login successful:', data);
                 localStorage.setItem('token', data.token);
-                localStorage.setItem('role', data.role); // If your backend sends the role
-                navigate('/dashboard');
-            } else {
-                setError(data.message || 'Login failed. Please check your credentials.');
-            }
+                localStorage.setItem('role', data.role);
+                localStorage.setItem('username', data.username);
+              
+                // Redirect based on role
+                switch (data.role) {
+                  case "admin":
+                    navigate("/dashboard/clinic");
+                    break;
+                  case "veterinary":
+                    navigate("/dashboard/clinic");
+                    break;
+                  case "staff":
+                    navigate("/dashboard/Billing");
+                    break;
+                  default:
+                    navigate("/dashboard");
+                    break;
+                }
+              }
 
         } catch (error) {
             console.error('Error during login:', error);
@@ -44,16 +60,20 @@ function Login() {
 
     return (
         <div>
-            <section className="bg-gray-50 min-h-screen flex items-center justify-center">
-                <div className="bg-gray-100 flex rounded-2xl shadow-lg max-w-3xl p-5">
+            
+            <section className=" min-h-screen flex items-center justify-center ">
+               <img src={BG} alt="" className='absolute -z-10 h-full w-full' />
+                <div className="bg-gray-100 flex rounded-2xl shadow-lg max-w-3xl p-10">
+         
                     <div className="md:w-1/2 px-8">
-                        <h2 className="font-bold text-2xl text-[#002D74]">Login</h2>
+                        <h1 className="font-bold text-5xl text-[#002D74]">Login</h1>
                         <p className="text-sm mt-4 text-[#537dc2]">
                             Welcome Back, have a nice day.
                         </p>
+                        <br />
 
                         <form className="flex flex-col gap-4" onSubmit={handleLogin}>
-                            <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">
+                            <label htmlFor="email" className="block text-gray-700 text-sm font-bold">
                                 Email:
                             </label>
                             <input
@@ -66,6 +86,9 @@ function Login() {
                                 onChange={(e) => setEmail(e.target.value)} // Updated onChange handler
                                 required
                             />
+                            <label htmlFor="password" className="block text-gray-700 text-sm font-bold">
+                                Password:
+                            </label>
                             <div className="relative">
                                 <input
                                     className="p-2 rounded-xl border w-full"

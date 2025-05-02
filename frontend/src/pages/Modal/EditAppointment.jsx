@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 
+
 const EditStatusModal = ({ appointment, onClose, onSave }) => {
   const [newStatus, setNewStatus] = useState(appointment.status);
 
   const handleSave = () => {
-    onSave(newStatus); // Call the onSave callback with the updated status
+
+    onSave(newStatus); 
+
   };
 
   return (

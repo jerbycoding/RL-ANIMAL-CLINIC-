@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const AppointmentModal = ({ appointment, onClose, onSave, mode = "view" }) => {
   const [formData, setFormData] = useState({
@@ -10,13 +11,14 @@ const AppointmentModal = ({ appointment, onClose, onSave, mode = "view" }) => {
     purpose: appointment.purpose,
     notes: appointment.notes || ""
   });
-
+  const navigate = useNavigate()
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSave = () => {
     if (onSave) onSave(formData);
+    navigate('/dashboard/Appointments')
   };
 
   return (

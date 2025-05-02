@@ -7,6 +7,11 @@ export default {
   ],
   theme: {
   	extend: {
+		backgroundImage: {
+			'sidebarBG': "url(/THESIS SYSTEM/frontend/src/assets/SidebarBG.png)",
+			'footer-texture': "url('/img/footer-texture.png')",
+		   }
+		,
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
