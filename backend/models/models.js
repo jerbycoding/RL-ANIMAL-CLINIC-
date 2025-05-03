@@ -15,9 +15,9 @@ const patientSchema = new mongoose.Schema({
   breed: { type: String, required: true },
   species: { type: String, required: true },
   color: { type: String, required: true },
-  owner: { type: mongoose.Schema.Types.ObjectId, ref: "Owner", required: true }
+  owner: { type: mongoose.Schema.Types.ObjectId, ref: "Owner", required: true },
+  registrationDate: { type: Date, default: Date.now } // Added registrationDate field with default value
 });
-
 // Test Schema
 const testSchema = new mongoose.Schema({
   patient: { type: mongoose.Schema.Types.ObjectId, ref: "Patient", required: true },

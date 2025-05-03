@@ -83,7 +83,7 @@ export const getNewPatientsThisMonthCount = async (req, res) => {
     const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
     const count = await Patient.countDocuments({
-      registrationDate: { $gte: startOfMonth, $lte: endOfMonth }, // Assuming you have a registrationDate field
+      registrationDate: { $gte: startOfMonth, $lte: endOfMonth },
     });
     res.json({ count });
   } catch (error) {
