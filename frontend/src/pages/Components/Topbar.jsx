@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
 import { FaBell, FaUserCircle } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { FaBars } from 'react-icons/fa'; 
 import catTopBar from '/THESIS SYSTEM/frontend/src/assets/Topbar/catTopBar.png'
+import logo from '/THESIS SYSTEM/frontend/src/assets/logo.png'
 export default function Topbar() {
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -37,17 +39,20 @@ export default function Topbar() {
 
   return (
     <div className="w-full">
-      <img src={catTopBar} alt=""  className="absolute h-16 w-full"/>
+      
   
-    <div className="flex justify-between items-center p-4  dark:bg-gray-800 shadow-md relative">
+      <div
+  className="flex justify-between items-center p-4 dark:bg-gray-800 shadow-md relative"
+  style={{ backgroundImage: `url(${catTopBar})` }}
+>
 
       <h1 className="text-xl font-bold text-gray-900 dark:text-gray-100 z-10">
-        WALA PA PONG LOGO HEHE
+        <img src={logo} alt="" className=" ml-10 w-[70px] h-[70px]"/>
       </h1>
       <div className="flex items-center gap-4">
-        <FaBell className="text-black-600 dark:text-gray-300 text-xl cursor-pointer z-10" />
+
         <div className="relative">
-          <FaUserCircle
+          <FaBars
             className="text-black-600 dark:text-gray-300 text-xl cursor-pointer"
             onClick={toggleDropdown}
             aria-expanded={isDropdownOpen}

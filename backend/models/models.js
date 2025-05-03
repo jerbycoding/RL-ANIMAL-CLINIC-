@@ -174,7 +174,7 @@ const examSchema = new mongoose.Schema({
 // Staff
 const staffSchema = new mongoose.Schema({
   name: { type: String, required: true },
-  role: { type: String, enum: ["Veterinarian", "Assistant", "Receptionist"], required: true },
+  role: { type: String, enum: ["Veterinarian", "Assistant"], required: true },
   email: { type: String, unique: true, required: true },
   phone: { type: String },
   schedule: [

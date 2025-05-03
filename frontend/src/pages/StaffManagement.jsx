@@ -3,7 +3,7 @@ import axios from "axios";
 import { RiCalendarScheduleLine } from "react-icons/ri";
 import { CiViewTable } from "react-icons/ci";
 import { useNavigate } from "react-router-dom";
-
+import { useSnackbar } from "notistack";
 const StaffTable = () => {
   const [isEditMode, setIsEditMode] = useState(false);
 const [formData, setFormData] = useState({
@@ -19,6 +19,7 @@ const [formData, setFormData] = useState({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     const fetchStaff = async () => {
@@ -57,6 +58,7 @@ const [formData, setFormData] = useState({
     });
     setIsEditMode(true);
     setIsModalOpen(true);
+    
   };
   
   const handleViewDetails = (member) => {
@@ -79,11 +81,11 @@ const [formData, setFormData] = useState({
         s._id === selectedStaff._id ? response.data : s
       );
       setStaff(updatedStaff);
-      alert("Staff updated successfully!");
+      enqueueSnackbar("Update  successfully!", { variant: "success" });
       closeModal();
     } catch (err) {
       console.error("Error updating staff:", err);
-      alert("Update failed.");
+      enqueueSnackbar("Error !", { variant: "error" });
     }
   };
 

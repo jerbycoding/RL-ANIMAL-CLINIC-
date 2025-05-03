@@ -137,42 +137,45 @@ function ServicesManagement() {
 
       {services.length > 0 ? (
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-white dark:bg-gray-800 shadow-md rounded-md">
-            <thead className="bg-gray-100 dark:bg-gray-700">
-              <tr>
-                <th className="py-3 px-4 text-left text-gray-700 dark:text-gray-300">Name</th>
-                <th className="py-3 px-4 text-left text-gray-700 dark:text-gray-300">Category</th>
-                <th className="py-3 px-4 text-left text-gray-700 dark:text-gray-300">Description</th>
-                <th className="py-3 px-4 text-left text-gray-700 dark:text-gray-300">Charge</th>
-                <th className="py-3 px-4 text-center text-gray-700 dark:text-gray-300">Actions</th>
+        <table className="min-w-full bg-white dark:bg-gray-800 shadow rounded-md">
+          <thead className="bg-gray-100 dark:bg-gray-700">
+            <tr>
+              <th className="py-3 px-4 text-left text-gray-700 dark:text-gray-300">Name</th>
+              <th className="py-3 px-4 text-left text-gray-700 dark:text-gray-300">Category</th>
+              <th className="py-3 px-4 text-left text-gray-700 dark:text-gray-300">Description</th>
+              <th className="py-3 px-4 text-left text-gray-700 dark:text-gray-300">Charge</th>
+              <th className="py-3 px-4 text-center text-gray-700 dark:text-gray-300">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {services.map((service, index) => (
+              <tr
+                key={service._id}
+                className={`${index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-900' : ''} border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors`}
+              >
+                <td className="py-3 px-4">{service.name}</td>
+                <td className="py-3 px-4">{service.category}</td>
+                <td className="py-3 px-4">{service.description}</td>
+                <td className="py-3 px-4">₱{service.charge?.toFixed(2)}</td>
+                <td className="py-3 px-4 text-center space-x-2">
+                  <button
+                    onClick={() => openEditModal(service)}
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded focus:outline-none focus:shadow-outline text-sm"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => openDeleteModal(service._id)}
+                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-3 rounded focus:outline-none focus:shadow-outline text-sm"
+                  >
+                    Delete
+                  </button>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {services.map((service) => (
-                <tr key={service._id} className="border-b dark:border-gray-600">
-                  <td className="py-3 px-4">{service.name}</td>
-                  <td className="py-3 px-4">{service.category}</td>
-                  <td className="py-3 px-4">{service.description}</td>
-                  <td className="py-3 px-4">₱{service.charge?.toFixed(2)}</td>
-                  <td className="py-3 px-4 text-center">
-                    <button
-                      onClick={() => openEditModal(service)}
-                      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded focus:outline-none focus:shadow-outline mr-2"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => openDeleteModal(service._id)}
-                      className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-3 rounded focus:outline-none focus:shadow-outline"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
+      </div>
       ) : (
         <p className="text-gray-600 dark:text-gray-400">No services available.</p>
       )}

@@ -1,6 +1,43 @@
 import {Inventory} from "../models/models.js";
 import {Shop} from "../models/models.js";
 
+
+
+export const getWeeklyShopRevenue = async (req, res) => {
+  try {
+    const now = new Date();
+    const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay())); // Start of the current week (Sunday)
+    startOfWeek.setHours(0, 0, 0, 0);
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(endOfWeek.getDate() + 7);
+    endOfWeek.setHours(23, 59, 59, 999);
+
+    const weeklyRevenue = await Shop.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: startOfWeek, $lt: endOfWeek },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalRevenue: { $sum: '$totalAmount' },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          totalRevenue: 1,
+        },
+      },
+    ]);
+
+    res.json({ totalRevenue: weeklyRevenue[0]?.totalRevenue || 0 });
+  } catch (error) {
+    console.error('Error fetching weekly shop revenue:', error);
+    res.status(500).json({ message: 'Error fetching weekly shop revenue' });
+  }
+};
 // 📌 Create a new Shop Invoice
 export const createShopInvoice = async (req, res) => {
   try {
